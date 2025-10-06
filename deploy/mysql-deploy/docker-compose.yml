@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: docker.1ms.run/mysql:${MYSQL_VERSION}
+    container_name: teacher-system-mysql
+    restart: always
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./data/${ENV}:/var/lib/mysql
+      - ./${ENV}/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./${ENV}/init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - teacher-system-net
+
+networks:
+  teacher-system-net:
+    external: true

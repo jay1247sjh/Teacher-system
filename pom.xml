@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.txq</groupId>
+    <artifactId>teacher-system</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>teacher-system-common</module>
+        <module>teacher-system-gateway</module>
+        <module>teacher-system-login</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <springboot.dependencies.version>3.2.5</springboot.dependencies.version>
+        <springcloud.version>2023.0.1</springcloud.version>
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
+        <openai.springdoc.version>2.1.0</openai.springdoc.version>
+        <nacos.discovery.version>2023.0.1.0</nacos.discovery.version>
+
+        <springboot.dependencies.version>3.2.5</springboot.dependencies.version>
+    </properties>
+
+    <dependencies>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--SpringBoot依赖管理-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--SpringCloud依赖管理-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${springcloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--Alibaba依赖管理-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--OpenAPI 3/Swagger UI-->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${openai.springdoc.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <!--开发环境-->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+        </profile>
+        <!--生产环境-->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--如果想通过Maven -P指定环境从而激活相关配置文件，在本地运行则需要安装springboot插件-->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${springboot.dependencies.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>

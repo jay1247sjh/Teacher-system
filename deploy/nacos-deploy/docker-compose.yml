@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  nacos:
+    image: ox26n5h75wajyn.xuanyuan.run/nacos/nacos-server:v2.3.0
+    container_name: teacher-system-nacos
+    restart: unless-stopped
+    networks:
+      - teacher-system-net
+    # Expose environment variables into the container (also used by Spring Boot)
+    env_file:
+      - ./nacos-config/custom.env
+    environment:
+      - MODE=${MODE}
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=${MYSQL_HOST}
+      - MYSQL_SERVICE_PORT=${MYSQL_PORT}
+      - MYSQL_SERVICE_DB_NAME=${MYSQL_DB}
+      - MYSQL_SERVICE_USER=${MYSQL_USER}
+      - MYSQL_SERVICE_PASSWORD=${MYSQL_PASSWORD}
+      - NACOS_CONTAINER_PORT=${NACOS_CONTAINER_PORT}
+      - NACOS_AUTH_ENABLE=true
+      - NACOS_AUTH_TOKEN_EXPIRE_SECONDS=18000
+      - NACOS_AUTH_TOKEN=${TOKEN_SECRET}
+      - NACOS_CORE_AUTH_SERVER_IDENTITY_KEY=serverIdentity
+      - NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE=security
+    # Map host port -> container port. Start script exports env vars before compose interpolation.
+    ports:
+      - "${NACOS_HOST_PORT}:${NACOS_CONTAINER_PORT}"
+      - "${NACOS_GRPC_HOST_PORT}:${NACOS_GRPC_CONTAINER_PORT}"
+    volumes:
+      # configuration file (mounted) - path may vary by image version; adjust if needed
+      - ./nacos-config/application.properties:/home/nacos/conf/application.properties
+      - ./logs:/home/nacos/logs
+
+networks:
+  teacher-system-net:
+    external: true
