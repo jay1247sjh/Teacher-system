@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: ox26n5h75wajyn.xuanyuan.run/prom/prometheus:latest
+    user: "0:0"
+    container_name: teacher-system-prometheus
+    restart: always
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    volumes:
+      - ./prometheus-config/${ENV}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${PROMETHEUS_DATA_PATH}:/prometheus
+    environment:
+      - TZ=Asia/Shanghai
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'  # 支持热加载配置

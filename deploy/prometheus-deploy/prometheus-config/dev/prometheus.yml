@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s        # 默认5秒抓取一次
+  scrape_timeout: 4s         # 最多等待4s
+
+scrape_configs:
+  - job_name: "teacher-system"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets:
+          - "192.168.0.100:10002"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):\d+'
+        replacement: '${1}'
