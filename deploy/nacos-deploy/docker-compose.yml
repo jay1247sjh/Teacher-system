@@ -8,7 +8,7 @@ services:
       - teacher-system-net
     # Expose environment variables into the container (also used by Spring Boot)
     env_file:
-      - ./nacos-config/custom.env
+      - .env
     environment:
       - MODE=${MODE}
       - SPRING_DATASOURCE_PLATFORM=mysql
