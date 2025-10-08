@@ -32,6 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
+# 字节码文件
 /tartget/
 
+# 环境变量
 config/**
