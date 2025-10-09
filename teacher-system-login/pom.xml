@@ -9,6 +9,7 @@
         <module>teacher-system-login-controller</module>
         <module>teacher-system-login-service</module>
         <module>teacher-system-login-repository</module>
+        <module>teacher-system-login-domain</module>
     </modules>
 
     <parent>
