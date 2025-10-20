@@ -1,5 +1,7 @@
 package com.txq.common.utils;
 
+import com.txq.common.result.ValidationResult;
+
 import java.util.regex.Pattern;
 
 /**
@@ -8,7 +10,11 @@ import java.util.regex.Pattern;
 public class PasswordValidator {
 
     // 默认正则表达式（检查是否只包含英文、数字和常见符号）
-    private static final String regex = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{}|;:',.<>?/]+$";
+    private static final String PASSWORD_REGEX = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{}|;:',.<>?/]+$";
+
+    // 预编译 Pattern
+    private static final Pattern DEFAULT_PASSWORD_PATTERN =
+            Pattern.compile(PASSWORD_REGEX);
 
     /**
      * 校验密码是否符合要求
@@ -28,34 +34,11 @@ public class PasswordValidator {
         }
         // 检查长度是否符合
         if (password.length() < minLength || password.length() > maxLength) {
-            return ValidationResult.fail("密码长度：大于" + (minLength - 1) + "位 小于" + (maxLength + 1));
+            return ValidationResult.fail("密码长度必须在 " + minLength + " 到 " + maxLength + " 位之间");
         }
-        if (!Pattern.matches(regex, password)) {
-            return ValidationResult.fail("密码格式必须由英文字母和数字组合");
+        if (!DEFAULT_PASSWORD_PATTERN.matches(PASSWORD_REGEX, password)) {
+            return ValidationResult.fail("密码格式只能包含英文字母、数字及常见符号");
         }
         return ValidationResult.success();
-    }
-
-    /**
-     * 校验密码是否符合传入正则表达式
-     */
-    public static ValidationResult validatePassword(String password, String regex) {
-        if (!Pattern.matches(regex, password)) {
-            return ValidationResult.fail("密码格式错误");
-        } else {
-            return ValidationResult.success();
-        }
-    }
-
-    // 校验结果封装类
-    public record ValidationResult(boolean valid, String message) {
-
-        public static ValidationResult success() {
-            return new ValidationResult(true, "");
-        }
-
-        public static ValidationResult fail(String msg) {
-            return new ValidationResult(false, msg);
-        }
     }
 }

@@ -12,7 +12,12 @@ import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.txq.interfaces",
+        "com.txq.application",
+        "com.txq.domain",
+        "com.txq.infrastructure"
+})
 public abstract class BaseApplication {
 
     private static final Logger log = LoggerFactory.getLogger(BaseApplication.class);

@@ -1,6 +1,6 @@
 package com.txq.common.exception;
 
-import com.txq.common.response.Response;
+import com.txq.common.result.Response;
 
 /**
  * 业务异常类
