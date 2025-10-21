@@ -1,0 +1,121 @@
+// ===== SCSS 变量定义 =====
+// 颜色变量
+$primary-color: #27ae60;
+$primary-light: #2ecc71;
+$primary-dark: #1e8449;
+$secondary-color: #667eea;
+$secondary-dark: #764ba2;
+$info-color: #3498db;
+$info-dark: #2980b9;
+$warning-color: #f39c12;
+$warning-dark: #e67e22;
+$error-color: #e74c3c;
+$error-dark: #c0392b;
+$success-color: #27ae60;
+$success-light: #2ecc71;
+
+// 文本颜色
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$text-muted: #95a5a6;
+$text-light: #bdc3c7;
+$text-white: #ffffff;
+
+// 背景颜色
+$background-primary: #ffffff;
+$background-secondary: #f8f9fa;
+$background-light: #fafbfc;
+$background-dark: #2c3e50;
+
+// 边框颜色
+$border-color: #ecf0f1;
+$border-light: #e9ecef;
+$border-dark: #dee2e6;
+
+// 阴影颜色
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-medium: rgba(0, 0, 0, 0.2);
+$shadow-dark: rgba(0, 0, 0, 0.3);
+$shadow-primary: rgba(39, 174, 96, 0.3);
+$shadow-info: rgba(52, 152, 219, 0.3);
+$shadow-warning: rgba(243, 156, 18, 0.3);
+$shadow-error: rgba(231, 76, 60, 0.3);
+
+// 尺寸变量
+$border-radius: 8px;
+$border-radius-small: 4px;
+$border-radius-large: 20px;
+$border-radius-xl: 24px;
+
+// 间距变量
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 20px;
+$spacing-xxl: 24px;
+$spacing-xxxl: 32px;
+$spacing-huge: 40px;
+
+// 字体变量
+$font-family-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-family-secondary: 'Helvetica Neue', Arial, sans-serif;
+$font-family-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+// 字体大小
+$font-size-xs: 10px;
+$font-size-sm: 12px;
+$font-size-md: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 18px;
+$font-size-xxl: 20px;
+$font-size-xxxl: 24px;
+$font-size-huge: 28px;
+$font-size-giant: 32px;
+
+// 字体权重
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// 行高
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// 动画变量
+$transition-fast: 0.15s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.5s ease;
+$transition-slower: 0.8s ease;
+
+// 缓动函数
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+// Z-index 层级
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// 断点变量
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+// 容器最大宽度
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1140px;
+$container-xxl: 1320px;
