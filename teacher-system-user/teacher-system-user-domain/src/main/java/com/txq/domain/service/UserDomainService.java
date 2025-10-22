@@ -1,10 +1,8 @@
 package com.txq.domain.service;
 
 import com.txq.common.exception.BizException;
-import com.txq.domain.model.User;
+import com.txq.domain.infra.repository.UserRepository;
 import com.txq.domain.model.WorkId;
-import com.txq.domain.repository.UserRepository;
-import com.txq.domain.security.PasswordEncryptor;
 
 import static com.txq.domain.status.ErrorCode.ACCOUNT_EXIST_ERROR_CODE;
 

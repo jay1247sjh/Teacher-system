@@ -1,4 +1,4 @@
-package com.txq.domain.security;
+package com.txq.domain.infra.security;
 
 /**
  * 密码加密接口

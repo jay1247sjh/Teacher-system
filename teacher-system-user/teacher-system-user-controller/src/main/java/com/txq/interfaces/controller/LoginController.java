@@ -4,6 +4,7 @@ import com.txq.application.service.ILoginService;
 import com.txq.common.annotation.ApiRequestMapping;
 import com.txq.common.result.Response;
 import com.txq.interfaces.converter.UserConverter;
+import com.txq.interfaces.entity.dto.EmailDTO;
 import com.txq.interfaces.entity.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,12 +19,25 @@ public class LoginController {
 
     private final ILoginService loginService;
 
-    // 普通用户注册
+    /**
+     * 普通用户注册
+     */
     @PostMapping("/register")
     public Response<String> register(@RequestBody UserDTO userDTO) {
         loginService.register(
-                UserConverter.INSTANCE.toCommand(userDTO)
+                UserConverter.INSTANCE.toQuery(userDTO)
         );
         return Response.success("注册成功");
+    }
+
+    /**
+     * 获取验证码
+     */
+    @PostMapping("/send-code")
+    public Response<String> sendCode(@RequestBody EmailDTO emailDTO) {
+        loginService.sendCode(
+                UserConverter.INSTANCE.toQuery(emailDTO)
+        );
+        return Response.success("获取验证码成功");
     }
 }

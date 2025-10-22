@@ -1,16 +1,16 @@
-package com.txq.infrastructure.security;
+package com.txq.infrastructure.service.security;
 
-import com.txq.domain.security.PasswordEncryptor;
+import com.txq.domain.infra.security.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * 密码加密类
+ * 密码加密服务
  */
 @Component
 @RequiredArgsConstructor
-public class BCryptPasswordEncryptor implements PasswordEncryptor {
+public class BCryptPasswordEncryptorImpl implements PasswordEncryptor {
 
     private final BCryptPasswordEncoder encoder;
 

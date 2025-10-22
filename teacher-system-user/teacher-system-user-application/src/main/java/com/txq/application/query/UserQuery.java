@@ -1,16 +1,16 @@
-package com.txq.interfaces.entity.dto;
+package com.txq.application.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户注册DTO
- */
+ * 用户参数Query
+ * */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserQuery {
     // 工号
     private String id;
 

@@ -5,18 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户注册DTO
+ * 邮箱验证码DTO
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
-    // 工号
-    private String id;
-
-    // 密码
-    private String password;
-
+public class EmailDTO {
     // 姓名
     private String username;
 

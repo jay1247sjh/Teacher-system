@@ -1,10 +1,9 @@
-package com.txq.infrastructure.repository;
+package com.txq.infrastructure.service.repository;
 
+import com.txq.domain.infra.repository.UserRepository;
 import com.txq.domain.model.User;
-import com.txq.domain.repository.UserRepository;
 import com.txq.infrastructure.assembler.UserAssembler;
 import com.txq.infrastructure.mapper.UserMapper;
-import com.txq.infrastructure.po.UserPO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

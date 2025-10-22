@@ -1,6 +1,6 @@
 package com.txq.domain.model;
 
-import com.txq.domain.security.PasswordEncryptor;
+import com.txq.domain.infra.security.PasswordEncryptor;
 import lombok.Getter;
 
 /**

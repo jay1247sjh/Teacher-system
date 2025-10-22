@@ -3,7 +3,7 @@ package com.txq.domain.model;
 import com.txq.common.exception.BizException;
 import com.txq.common.result.ValidationResult;
 import com.txq.common.utils.PasswordValidator;
-import com.txq.domain.security.PasswordEncryptor;
+import com.txq.domain.infra.security.PasswordEncryptor;
 
 import static com.txq.domain.status.ErrorCode.PASSWORD_VALIDATE_ERROR_CODE;
 

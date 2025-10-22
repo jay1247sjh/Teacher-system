@@ -1,6 +1,6 @@
 package com.txq.domain.config;
 
-import com.txq.domain.repository.UserRepository;
+import com.txq.domain.infra.repository.UserRepository;
 import com.txq.domain.service.UserDomainService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

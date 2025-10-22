@@ -1,4 +1,4 @@
-package com.txq.domain.repository;
+package com.txq.domain.infra.repository;
 
 import com.txq.domain.model.User;
 

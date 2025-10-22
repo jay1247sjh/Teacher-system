@@ -1,22 +1,16 @@
-package com.txq.application.command;
+package com.txq.application.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户参数Command
+ * 邮箱验证码参数Query
  * */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCommand {
-    // 工号
-    private String id;
-
-    // 密码
-    private String password;
-
+public class EmailQuery {
     // 姓名
     private String username;
 
