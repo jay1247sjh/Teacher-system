@@ -1,8 +1,9 @@
 package com.txq.infrastructure.service.notice;
 
+import com.txq.common.exception.BizException;
 import com.txq.common.service.CodeCache;
-import com.txq.domain.infra.notice.MailService;
 import com.txq.domain.event.SendMailEvent;
+import com.txq.domain.infra.notice.MailService;
 import com.txq.infrastructure.properties.MailProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -12,6 +13,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import static com.txq.domain.status.ErrorCode.EMAIL_CODE_VALIDATE_ERROR_COE;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +31,8 @@ public class MailServiceImpl implements MailService {
 
     /**
      * 发送邮件
+     *
+     * @param sendMailEvent 事件对象
      */
     @Async("mailTaskExecutor")      // 使用异步线程池
     @EventListener
@@ -39,7 +44,7 @@ public class MailServiceImpl implements MailService {
             // 发送者
             String sender = mailProperties.getFrom();
             // 保存到缓存，5分钟结束
-            codeCache.saveCode(sender, String.valueOf(code), 5);
+            codeCache.saveCode(sendMailEvent.email(), String.valueOf(code), 5);
 
             MimeMessage message = mailSender.createMimeMessage();
             // 允许内嵌资源和附件，并指定为UTF-8
@@ -58,6 +63,19 @@ public class MailServiceImpl implements MailService {
             mailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException("发送邮件失败", e);
+        }
+    }
+
+    /**
+     * 验证邮箱验证码
+     *
+     * @param email 邮箱
+     * @param code  验证码
+     */
+    @Override
+    public void validateMailCode(String email, String code) {
+        if (!codeCache.validateCode(email, code)) {
+            throw new BizException(EMAIL_CODE_VALIDATE_ERROR_COE, "验证码错误");
         }
     }
 }

@@ -7,4 +7,6 @@ import com.txq.domain.event.SendMailEvent;
  */
 public interface MailService {
     void sendRegisterMail(SendMailEvent sendMailEvent);
+
+    void validateMailCode(String email, String code);
 }

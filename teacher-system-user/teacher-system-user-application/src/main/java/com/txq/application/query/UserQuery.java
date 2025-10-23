@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 用户参数Query
- * */
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,4 +22,7 @@ public class UserQuery {
 
     // 邮箱
     private String email;
+
+    // 验证码
+    private String code;
 }

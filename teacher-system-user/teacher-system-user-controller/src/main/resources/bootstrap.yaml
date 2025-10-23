@@ -26,4 +26,10 @@ spring:
           - data-id: teacher-system-config-mybatisplus.yaml
             group: DEFAULT_GROUP
             refresh: true
+          - data-id: teacher-system-config-email.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-data-email.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 

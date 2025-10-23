@@ -3,7 +3,6 @@ package com.txq.application.service.impl;
 import com.txq.application.query.EmailQuery;
 import com.txq.application.query.UserQuery;
 import com.txq.application.service.ILoginService;
-import com.txq.common.service.CodeCache;
 import com.txq.domain.event.SendMailEvent;
 import com.txq.domain.infra.notice.MailService;
 import com.txq.domain.infra.repository.UserRepository;
@@ -28,6 +27,9 @@ public class LoginServiceImpl implements ILoginService {
     // 用户信息领域服务
     private final UserDomainService userDomainService;
 
+    // 用户邮箱处理类
+    private final MailService mailService;
+
     // 用户信息存储类
     private final UserRepository userRepository;
 
@@ -43,6 +45,8 @@ public class LoginServiceImpl implements ILoginService {
         WorkId workId = new WorkId(userQuery.getId());
         // 调用领域服务判断是否可以注册
         userDomainService.checkUserCanRegister(workId);
+        // 验证注册码
+        mailService.validateMailCode(userQuery.getEmail(), userQuery.getCode());
         // 创建领域对象
         User user = User.create(
                 userQuery.getId(),
@@ -51,7 +55,6 @@ public class LoginServiceImpl implements ILoginService {
                 userQuery.getEmail(),
                 passwordEncryptor
         );
-
         // 持久化
         userRepository.saveUser(user);
     }

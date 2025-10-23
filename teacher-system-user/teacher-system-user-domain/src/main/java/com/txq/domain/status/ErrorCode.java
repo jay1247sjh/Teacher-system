@@ -19,4 +19,7 @@ public class ErrorCode {
 
     // 邮箱格式不符合
     public final static int EMAIL_VALIDATE_ERROR_CODE = USER_BIZ_BASE_CODE + 4;
+
+    // 验证码错误
+    public final static int EMAIL_CODE_VALIDATE_ERROR_COE = USER_BIZ_BASE_CODE + 5;
 }

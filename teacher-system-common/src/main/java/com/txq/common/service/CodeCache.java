@@ -1,10 +1,14 @@
 package com.txq.common.service;
 
-import org.springframework.stereotype.Component;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码缓存工具
@@ -75,6 +79,8 @@ public class CodeCache {
     /**
      * 验证码类
      */
+    @Data
+    @RequiredArgsConstructor
     private static class CodeEntry {
 
         // 验证码
@@ -82,11 +88,6 @@ public class CodeCache {
 
         // 过期时间
         final long expireAt;
-
-        CodeEntry(String code, long expireAt) {
-            this.code = code;
-            this.expireAt = expireAt;
-        }
 
         /**
          * 判断是否过期

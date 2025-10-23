@@ -24,6 +24,7 @@ public class LoginController {
      */
     @PostMapping("/register")
     public Response<String> register(@RequestBody UserDTO userDTO) {
+        System.out.println(userDTO.getCode());
         loginService.register(
                 UserConverter.INSTANCE.toQuery(userDTO)
         );

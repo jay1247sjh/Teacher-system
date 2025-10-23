@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @SpringBootApplication(scanBasePackages = {
+        "com.txq.common",
         "com.txq.interfaces",
         "com.txq.application",
         "com.txq.domain",

@@ -1,8 +1,5 @@
 package com.txq.domain.event;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 /**
  * 发送邮件对象
  *
