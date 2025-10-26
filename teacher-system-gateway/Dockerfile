@@ -1,4 +1,4 @@
-FROM ox26n5h75wajyn.xuanyuan.run/library/maven:3.9.6-eclipse-temurin-21 AS build
+FROM library/maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /teacher-system
 
@@ -15,7 +15,7 @@ COPY . .
 
 RUN mvn -s /root/.m2/settings.xml -pl teacher-system-gateway -am -Pdev -DskipTests package
 
-FROM ox26n5h75wajyn.xuanyuan.run/library/eclipse-temurin:21-jre-jammy AS runtime
+FROM library/eclipse-temurin:21-jre-jammy AS runtime
 
 RUN apt-get update && apt-get install -y curl bash dos2unix && rm -rf /var/lib/apt/lists/*
 
