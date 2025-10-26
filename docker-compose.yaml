@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: ./teacher-system-gateway/Dockerfile
+    container_name: teacher-system-gateway
+    ports:
+      - "10001:10001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - NACOS_ADDR=localhost:8848
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    env_file:
+      - ./config/dev.env
+
+networks:
+  teacher-system-net:
+    external: true
