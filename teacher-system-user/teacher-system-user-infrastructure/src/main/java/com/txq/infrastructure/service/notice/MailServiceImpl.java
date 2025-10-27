@@ -14,7 +14,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import static com.txq.domain.status.ErrorCode.EMAIL_CODE_VALIDATE_ERROR_COE;
+import static com.txq.domain.status.ErrorCode.EMAIL_CODE_VALIDATE_ERROR_CODE;
 
 @Component
 @RequiredArgsConstructor
@@ -75,7 +75,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void validateMailCode(String email, String code) {
         if (!codeCache.validateCode(email, code)) {
-            throw new BizException(EMAIL_CODE_VALIDATE_ERROR_COE, "验证码错误");
+            throw new BizException(EMAIL_CODE_VALIDATE_ERROR_CODE, "验证码错误");
         }
     }
 }

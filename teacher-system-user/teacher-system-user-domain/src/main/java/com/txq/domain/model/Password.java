@@ -4,27 +4,27 @@ import com.txq.common.exception.BizException;
 import com.txq.common.result.ValidationResult;
 import com.txq.common.utils.PasswordValidator;
 import com.txq.domain.infra.security.PasswordEncryptor;
+import lombok.*;
+import org.apache.commons.lang3.builder.HashCodeExclude;
+
+import java.util.Objects;
 
 import static com.txq.domain.status.ErrorCode.PASSWORD_VALIDATE_ERROR_CODE;
 
 /**
  * 密码领域对象
  */
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString
 public class Password {
 
     private String password;
 
-    public Password() {
-
-    }
-
-    public Password(String password) {
-        this.password = password;
-    }
-
     /**
      * 校验并加密
-     * */
+     */
     public static Password of(String rawPassword,
                               PasswordEncryptor passwordEncryptor) {
         // 校验密码
@@ -36,16 +36,16 @@ public class Password {
 
     /**
      * 加密后初始化
-     * */
+     */
     public static Password encrypted(String encryptedPassword) {
         return new Password(encryptedPassword);
     }
 
     /**
-     * 获取密码
-     * */
-    public String getPassword() {
-        return password;
+     * 比较密码是否相同
+     */
+    public boolean comparePassword(Password password) {
+        return this.password.equals(password.getPassword());
     }
 
     /**

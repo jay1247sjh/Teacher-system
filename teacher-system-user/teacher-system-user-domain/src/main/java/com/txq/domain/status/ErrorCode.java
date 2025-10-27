@@ -21,5 +21,11 @@ public class ErrorCode {
     public final static int EMAIL_VALIDATE_ERROR_CODE = USER_BIZ_BASE_CODE + 4;
 
     // 验证码错误
-    public final static int EMAIL_CODE_VALIDATE_ERROR_COE = USER_BIZ_BASE_CODE + 5;
+    public final static int EMAIL_CODE_VALIDATE_ERROR_CODE = USER_BIZ_BASE_CODE + 5;
+
+    // 账号不存在
+    public final static int ACCOUNT_NOT_EXIST_ERROR_CODE = USER_BIZ_BASE_CODE + 6;
+
+    // 密码错误
+    public final static int PASSWORD_ERROR_CODE = USER_BIZ_BASE_CODE + 7;
 }

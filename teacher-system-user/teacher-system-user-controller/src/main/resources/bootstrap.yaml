@@ -32,4 +32,10 @@ spring:
           - data-id: teacher-system-data-email.yaml
             group: DEFAULT_GROUP
             refresh: true
+          - data-id: teacher-system-data-publickey.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-data-privatekey.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 

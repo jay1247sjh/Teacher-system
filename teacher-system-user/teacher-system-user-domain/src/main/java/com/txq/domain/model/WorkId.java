@@ -1,23 +1,27 @@
 package com.txq.domain.model;
 
 import com.txq.common.exception.BizException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import static com.txq.domain.status.ErrorCode.WORK_ID_VALIDATE_ERROR_CODE;
 
+/**
+ * 工号领域对象
+ */
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString
 public class WorkId {
+    // 工号字符串
     private String id;
-
-    public WorkId() {
-
-    }
-
-    public WorkId(String id) {
-        this.id = id;
-    }
 
     /**
      * 校验并返回
-     * */
+     */
     public static WorkId of(String id) {
         validateIdFormat(id);
         return new WorkId(id);

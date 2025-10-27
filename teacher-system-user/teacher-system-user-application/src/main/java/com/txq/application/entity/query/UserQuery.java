@@ -1,4 +1,4 @@
-package com.txq.application.query;
+package com.txq.application.entity.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

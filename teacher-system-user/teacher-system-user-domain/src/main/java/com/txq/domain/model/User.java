@@ -1,12 +1,18 @@
 package com.txq.domain.model;
 
 import com.txq.domain.infra.security.PasswordEncryptor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * 注册领域模型
  */
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@ToString
 public class User {
     // 工号
     private WorkId workId;
@@ -19,13 +25,6 @@ public class User {
 
     // 邮箱
     private Email email;
-
-    public User(WorkId id, String username, Password password, Email email) {
-        this.workId = id;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
 
     public static User create(String id, String username, String rawPassword, String email,
                               PasswordEncryptor passwordEncryptor) {

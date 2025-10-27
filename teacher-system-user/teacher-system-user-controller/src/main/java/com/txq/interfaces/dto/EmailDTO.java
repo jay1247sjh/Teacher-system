@@ -1,16 +1,16 @@
-package com.txq.application.query;
+package com.txq.interfaces.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 邮箱验证码参数Query
- * */
+ * 邮箱验证码DTO
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailQuery {
+public class EmailDTO {
     // 姓名
     private String username;
 
