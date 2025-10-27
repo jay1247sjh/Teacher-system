@@ -56,8 +56,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { useRouter } from "vue-router";
+import {defineComponent} from "vue";
+import {useRouter} from "vue-router";
 import FormInput from "@/components/FormInput.vue";
 import EmailCodeInput from "@/components/CodeInput.vue";
 
