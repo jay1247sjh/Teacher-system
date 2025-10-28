@@ -6,7 +6,7 @@
             <input :id="id" :value="modelValue" :type="inputType" :placeholder="placeholder" :maxlength="maxlength"
                 :autocomplete="autocomplete" :required="required" @input="handleInput" />
             <button v-if="showPasswordToggle" type="button" class="password-toggle" @click="$emit('toggle-password')">
-                {{ showPassword ? '👁️' : '👁️' }}
+                {{ showPassword ? '👁️‍🗨️' : '👁️‍🗨️' }}
             </button>
         </div>
         <div v-if="errorMessage" class="error-message">

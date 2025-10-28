@@ -3,7 +3,7 @@
         <div class="register-wrapper">
             <!-- Logo区域 -->
             <div class="logo-section">
-                <img src="@/assets/logo.jpg" alt="学校Logo" class="school-logo" />
+                <img src="@/assets/logo.png" alt="学校Logo" class="school-logo" />
                 <h1 class="register-title">外国语学院教师管理系统</h1>
                 <p class="register-subtitle">
                     Foreign Languages College Teacher Management System

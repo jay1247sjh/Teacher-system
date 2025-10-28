@@ -3,9 +3,9 @@
         <div class="login-wrapper">
             <!-- Logo区域 -->
             <div class="logo-section">
-                <img src="@/assets/logo.jpg" alt="学校Logo" class="school-logo" />
+                <img src="@/assets/logo.png" alt="学校Logo" class="school-logo" />
                 <h1 class="login-title">外国语学院教师管理系统</h1>
-                <p class="login-subtitle">Foreign Languages College Teacher Management System</p>
+                <p class="login-subtitle">Staff Archive of SFL</p>
             </div>
 
             <!-- 登录表单区域 -->
@@ -187,7 +187,7 @@ export default defineComponent({
 }
 
 .login-subtitle {
-    font-size: $font-size-md;
+    font-size: $font-size-xxl;
     opacity: 0.8;
     text-align: center;
     position: relative;
