@@ -20,5 +20,9 @@ public class RoleRepositoryImpl implements RoleRepository {
     public Role getRoleByRoleId(int roleId) {
         // 获取PO数据
         RolePO rolePO = roleMapper.selectById(roleId);
+        return new Role(rolePO.getId(),
+                rolePO.getRoleName(),
+                rolePO.getRoleDescription(),
+                null);
     }
 }

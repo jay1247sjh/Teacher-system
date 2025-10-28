@@ -44,4 +44,16 @@ public class UserRepositoryImpl implements UserRepository {
         // 提取密码
         return userMapper.selectOne(passwordQuery).getPassword();
     }
+
+    /**
+     * 根据id获取用户名
+     */
+    @Override
+    public String getUsernameById(String id) {
+        LambdaQueryWrapper<UserPO> usernameQuery = new LambdaQueryWrapper<UserPO>()
+                .select(UserPO::getUsername)
+                .eq(UserPO::getId, id);
+        // 提取用户名
+        return userMapper.selectOne(usernameQuery).getUsername();
+    }
 }

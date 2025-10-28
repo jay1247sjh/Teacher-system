@@ -4,10 +4,10 @@ import com.txq.common.exception.BizException;
 import com.txq.common.result.ValidationResult;
 import com.txq.common.utils.PasswordValidator;
 import com.txq.domain.infra.security.PasswordEncryptor;
-import lombok.*;
-import org.apache.commons.lang3.builder.HashCodeExclude;
-
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import static com.txq.domain.status.ErrorCode.PASSWORD_VALIDATE_ERROR_CODE;
 

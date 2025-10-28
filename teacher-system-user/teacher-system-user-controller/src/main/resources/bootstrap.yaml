@@ -38,4 +38,7 @@ spring:
           - data-id: teacher-system-data-privatekey.yaml
             group: DEFAULT_GROUP
             refresh: true
+          - data-id: teacher-system-config-common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
 

@@ -8,7 +8,7 @@ import com.txq.application.entity.vo.UserVO;
 /**
  * 登录注册接口
  */
-public interface ILoginService {
+public interface IUserService {
     /**
      * 注册
      */

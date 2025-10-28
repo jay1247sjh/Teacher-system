@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.TimeZone;
 
 @SpringBootApplication(scanBasePackages = {
         "com.txq.common",
@@ -30,6 +31,8 @@ public abstract class BaseApplication {
         }
         SpringApplication app = new SpringApplication(this.getClass());
         app.setBannerMode(Banner.Mode.CONSOLE);
+        // 设置为UTC+8时区
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         // 启动SpringBoot应用
         ConfigurableApplicationContext context = app.run(args);
         // 打印相关信息

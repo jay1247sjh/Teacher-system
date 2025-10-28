@@ -1,6 +1,7 @@
 package com.txq.interfaces.controller;
 
-import com.txq.application.service.ILoginService;
+import com.txq.application.entity.vo.UserVO;
+import com.txq.application.service.IUserService;
 import com.txq.common.annotation.ApiRequestMapping;
 import com.txq.common.result.Response;
 import com.txq.interfaces.converter.UserConverter;
@@ -14,18 +15,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * 登录注册控制器
  */
-@ApiRequestMapping("/login")
+@ApiRequestMapping("/user")
 @RequiredArgsConstructor
-public class LoginController {
+public class UserController {
 
-    private final ILoginService loginService;
+    private final IUserService loginService;
 
     /**
      * 用户注册
      */
     @PostMapping("/register")
     public Response<String> register(@RequestBody UserDTO userDTO) {
-        System.out.println(userDTO.getCode());
         loginService.register(
                 UserConverter.INSTANCE.toQuery(userDTO)
         );
@@ -47,8 +47,10 @@ public class LoginController {
      * 用户登录
      */
     @PostMapping("/login")
-    public Response<String> login(@RequestBody LoginDTO loginDTO) {
-
-        return Response.success("登录成功");
+    public Response<UserVO> login(@RequestBody LoginDTO loginDTO) {
+        UserVO userVO = loginService.login(
+                UserConverter.INSTANCE.toQuery(loginDTO)
+        );
+        return Response.success(userVO);
     }
 }

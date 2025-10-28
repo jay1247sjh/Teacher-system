@@ -21,4 +21,9 @@ public interface UserRepository {
      * 根据id获取密码
      */
     String getPasswordById(String id);
+
+    /**
+     * 根据id获取用户名
+     */
+    String getUsernameById(String id);
 }

@@ -18,5 +18,5 @@ public class RolePO {
     private String roleName;
 
     // 角色描述
-    private String RoleDescription;
+    private String roleDescription;
 }

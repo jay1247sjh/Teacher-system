@@ -5,9 +5,8 @@ import com.txq.application.entity.query.EmailQuery;
 import com.txq.application.entity.query.LoginQuery;
 import com.txq.application.entity.query.UserQuery;
 import com.txq.application.entity.vo.UserVO;
-import com.txq.application.service.ILoginService;
+import com.txq.application.service.IUserService;
 import com.txq.common.exception.BizException;
-import com.txq.common.result.Response;
 import com.txq.domain.event.SendMailEvent;
 import com.txq.domain.infra.notice.MailService;
 import com.txq.domain.infra.repository.UserRepository;
@@ -24,19 +23,21 @@ import sjh.jwt.JwtUtils;
 import sjh.jwt.KeyUtils;
 
 import java.security.PrivateKey;
-import java.time.Duration;
+import java.time.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.txq.common.result.Response.ResultCode.BUSINESS_ERROR;
+import static com.txq.domain.status.ErrorCode.ACCOUNT_NOT_EXIST_ERROR_CODE;
+import static com.txq.domain.status.ErrorCode.PASSWORD_ERROR_CODE;
 
 /**
  * 登录注册应用类
  */
 @Service
 @RequiredArgsConstructor
-public class LoginServiceImpl implements ILoginService {
+public class UserServiceImpl implements IUserService {
 
     // 事件推送者
     private final ApplicationEventPublisher publisher;
@@ -78,8 +79,10 @@ public class LoginServiceImpl implements ILoginService {
                 userQuery.getEmail(),
                 passwordEncryptor
         );
-        // 持久化
+        // 持久化用户信息
         userRepository.saveUser(user);
+        // 角色赋值为普通角色
+        userRoleRepository.addUserRole(workId.getId(), 3);
     }
 
     /**
@@ -98,12 +101,21 @@ public class LoginServiceImpl implements ILoginService {
      */
     @Override
     public UserVO login(LoginQuery loginQuery) {
+        // 过期时间
+        int expireTime = 30;
         // 获取工号对象
-        WorkId workId = WorkId.of(loginQuery.getId());
-        // 获取密码对象
-        Password password = Password.of(loginQuery.getPassword(), passwordEncryptor);
+        WorkId id = WorkId.of(loginQuery.getId());
         // 校验账号和密码
-        userDomainService.checkLoginForm(workId, password);
+        // 判断账号是否已注册
+        if (!userRepository.existsById(id.getId())) {
+            throw new BizException(ACCOUNT_NOT_EXIST_ERROR_CODE, "账号未注册");
+        }
+        // 从数据库获取注册密码
+        String encryptedPassword = userRepository.getPasswordById(id.getId());
+        // 判断密码是否相同
+        if (!passwordEncryptor.matches(loginQuery.getPassword(), encryptedPassword)) {
+            throw new BizException(PASSWORD_ERROR_CODE, "输入密码错误");
+        }
         try {
             // 获取私钥Base64字符串
             String privateKey = keyPairConfig.getPrivateKey();
@@ -112,15 +124,25 @@ public class LoginServiceImpl implements ILoginService {
             // 添加用户额外信息
             Map<String, Object> personalInfo = new HashMap<>();
             // 存入用户角色id
-            personalInfo.put("roleId", userRoleRepository.getRoleIdById(workId.getId()));
+            personalInfo.put("roleId", userRoleRepository.getRoleIdById(id.getId()));
             // 生成Token
-            JwtUtils.generateToken(
+            String token = JwtUtils.generateToken(
                     privatekey,
-                    Duration.ofMinutes(30),
-                    workId.getId(),
+                    Duration.ofMinutes(expireTime),
+                    id.getId(),
                     "teacher-user-service",
                     "teacher-other-service",
                     personalInfo,
+                    null
+            );
+            // 生成用户信息视图
+            return new UserVO(
+                    token,
+                    Date.from(Instant.now().plus(Duration.ofMinutes(expireTime))).toInstant(),
+                    id.getId(),
+                    userRepository.getUsernameById(id.getId()),
+                    null,
+                    null,
                     null
             );
         } catch (Exception e) {

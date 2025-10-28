@@ -21,4 +21,12 @@ public class BCryptPasswordEncryptorImpl implements PasswordEncryptor {
     public String encrypt(String rawPassword) {
         return encoder.encode(rawPassword);
     }
+
+    /**
+     * 获取加密算法和盐值进行匹配
+     * */
+    @Override
+    public boolean matches(String rawPassword, String encodedPassword) {
+        return encoder.matches(rawPassword, encodedPassword);
+    }
 }
