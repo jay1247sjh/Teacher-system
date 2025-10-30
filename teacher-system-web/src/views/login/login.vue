@@ -20,8 +20,7 @@
                         autocomplete="username" icon="user" required />
 
                     <FormInput id="password" v-model="loginForm.password" label="密码" placeholder="请输入密码"
-                        autocomplete="current-password" icon="lock" show-password-toggle :show-password="showPassword"
-                        required @toggle-password="togglePassword" />
+                        autocomplete="current-password" icon="lock" show-password-toggle required />
 
                     <div class="form-options">
                         <label class="remember-me">
@@ -47,30 +46,35 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
+import { defineComponent } from 'vue'
 import FormInput from '@/components/FormInput.vue'
+
+interface LoginForm {
+    username: string
+    password: string
+    rememberMe: boolean
+}
 
 export default defineComponent({
     name: 'LoginIndex',
     components: {
         FormInput
     },
-    data() {
+    data(): {
+        loginForm: LoginForm
+        loading: boolean
+    } {
         return {
             loginForm: {
                 username: '',
                 password: '',
                 rememberMe: false
             },
-            showPassword: false,
             loading: false
         }
     },
     methods: {
-        togglePassword() {
-            this.showPassword = !this.showPassword
-        },
-        async handleLogin() {
+        async handleLogin(): Promise<void> {
             if (!this.loginForm.username || !this.loginForm.password) {
                 return
             }

@@ -22,13 +22,11 @@
                         :maxlength="10" autocomplete="username" icon="id" required />
 
                     <FormInput id="password" v-model="registerForm.password" label="密码" placeholder="请输入密码"
-                        autocomplete="new-password" icon="lock" show-password-toggle :show-password="showPassword"
-                        required @toggle-password="togglePassword" />
+                        autocomplete="new-password" icon="lock" show-password-toggle required />
 
                     <FormInput id="confirmPassword" v-model="registerForm.confirmPassword" label="确认密码"
                         placeholder="请再次输入密码" autocomplete="new-password" icon="lock" show-password-toggle
-                        :show-password="showConfirmPassword" :error-message="passwordMismatch ? '两次输入的密码不一致' : ''"
-                        required @toggle-password="toggleConfirmPassword" />
+                        :error-message="passwordMismatch ? '两次输入的密码不一致' : ''" required />
 
                     <FormInput id="name" v-model="registerForm.name" label="姓名" placeholder="请输入真实姓名"
                         autocomplete="name" icon="user" required />
@@ -56,31 +54,25 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
-import {useRouter} from "vue-router";
+import { defineComponent } from "vue";
 import FormInput from "@/components/FormInput.vue";
 import EmailCodeInput from "@/components/CodeInput.vue";
+
+interface RegisterForm {
+    employeeId: string
+    password: string
+    confirmPassword: string
+    name: string
+    email: string
+    emailCode: string
+}
+
 
 export default defineComponent({
     name: "RegisterIndex",
     components: {
         FormInput,
         EmailCodeInput,
-    },
-    setup() {
-        // 工号长度
-        const EMPLOYEE_ID_LENGTH = 10;
-        // 邮箱正则表达式
-        const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}$/i;
-
-        // 路由实例
-        const router = useRouter();
-
-        return {
-            EMPLOYEE_ID_LENGTH,
-            EMAIL_REGEX,
-            router,
-        };
     },
     data() {
         return {
@@ -98,30 +90,31 @@ export default defineComponent({
                 email: "",
                 // 邮箱验证码
                 emailCode: "",
-            },
-            // 显示密码
-            showPassword: false,
-            // 显示确认密码
-            showConfirmPassword: false,
+            } as RegisterForm,
             // 加载状态
-            loading: false,
+            loading: false as boolean,
             // 验证码错误
-            codeError: false,
+            codeError: false as boolean,
             // 验证码倒计时时间
-            countdown: 0,
+            countdown: 0 as number,
+
+            /**
+             * 常量
+             */
+            // 工号长度
+            EMPLOYEE_ID_LENGTH: 10 as number,
+            // 邮箱正则
+            EMAIL_REGEX: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}$/i as RegExp,
         };
     },
     computed: {
         // 判断两次输入密码是否相同
-        passwordMismatch() {
-            return (
-                this.registerForm.password &&
-                this.registerForm.confirmPassword &&
-                this.registerForm.password !== this.registerForm.confirmPassword
-            );
+        passwordMismatch(): boolean {
+            const { password, confirmPassword } = this.registerForm
+            return password !== "" && confirmPassword !== "" && password !== confirmPassword
         },
         // 判断邮箱格式是否正确，true为错误
-        emailError() {
+        emailError(): boolean {
             const email = this.registerForm.email.trim();
             // 如果邮箱为空，不显示错误
             if (email === '') {
@@ -131,35 +124,28 @@ export default defineComponent({
             return !this.EMAIL_REGEX.test(email);
         },
         // 判断是否可以发送验证码
-        canSendCode() {
+        canSendCode(): boolean {
             const email = this.registerForm.email.trim();
             return email !== '' && this.EMAIL_REGEX.test(email);
         },
         // 表单校验
-        isFormValid() {
+        isFormValid(): boolean {
+            const form = this.registerForm
             return (
-                this.registerForm.employeeId.length === this.EMPLOYEE_ID_LENGTH &&
-                this.registerForm.password &&
-                this.registerForm.confirmPassword &&
-                this.registerForm.name &&
-                this.registerForm.email &&
-                this.registerForm.emailCode &&
+                form.employeeId.length === this.EMPLOYEE_ID_LENGTH &&
+                form.password.trim() !== "" &&
+                form.confirmPassword.trim() !== "" &&
+                form.name.trim() !== "" &&
+                form.email.trim() !== "" &&
+                form.emailCode.trim() !== "" &&
                 !this.passwordMismatch &&
                 !this.codeError
-            );
+            )
         },
     },
     methods: {
-        // 切换密码显示状态
-        togglePassword() {
-            this.showPassword = !this.showPassword;
-        },
-        // 切换确认密码显示状态
-        toggleConfirmPassword() {
-            this.showConfirmPassword = !this.showConfirmPassword;
-        },
         // 发送验证码
-        async sendEmailCode() {
+        async sendEmailCode(): Promise<void> {
             // 设置倒计时并开始倒计
             this.countdown = 60;
             let timer = setInterval(() => {
@@ -170,7 +156,7 @@ export default defineComponent({
             }, 1000);
         },
         // 注册
-        async handleRegister() { },
+        async handleRegister(): Promise<void> { },
     },
 });
 </script>

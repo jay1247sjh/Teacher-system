@@ -26,6 +26,12 @@
     justify-content: center;
 }
 
+@mixin flex-column-between {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 // 定位混入
 @mixin absolute-center {
     position: absolute;

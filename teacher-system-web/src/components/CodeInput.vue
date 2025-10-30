@@ -18,65 +18,60 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import { defineComponent, type PropType } from "vue";
 
 export default defineComponent({
     name: "EmailCodeInput",
     props: {
         // 组件id
         id: {
-            type: String,
+            type: String as PropType<string>,
             required: true,
         },
         // 表单值
         modelValue: {
-            type: String,
+            type: String as PropType<string>,
             required: true,
         },
         // 标签名
         label: {
-            type: String,
+            type: String as PropType<string>,
             default: "",
         },
         // 占位符
         placeholder: {
-            type: String,
+            type: String as PropType<string>,
             default: "",
         },
         // 最长长度
         maxlength: {
-            type: Number,
+            type: Number as PropType<number>,
             default: undefined,
         },
         // 是否必须
         required: {
-            type: Boolean,
+            type: Boolean as PropType<boolean>,
             default: false,
         },
         // 是否可发送
         canSend: {
-            type: Boolean,
+            type: Boolean as PropType<boolean>,
             required: true,
         },
         // 倒计时时间
         countdown: {
-            type: Number,
+            type: Number as PropType<number>,
             default: 0,
         },
         // 错误信息
         errorMessage: {
-            type: String,
+            type: String as PropType<string>,
             default: "",
         },
     },
-    emits: ["update:modelValue", "send-code"],
-    data() {
-        return {
-
-        };
-    },
-    created() {
-
+    emits: {
+        "update:modelValue": (value: string) => typeof value === "string",
+        "send-code": () => true
     },
     methods: {
         // 处理输入事件

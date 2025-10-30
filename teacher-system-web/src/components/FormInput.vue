@@ -5,8 +5,8 @@
             <i v-if="icon" :class="`icon-${icon}`"></i>
             <input :id="id" :value="modelValue" :type="inputType" :placeholder="placeholder" :maxlength="maxlength"
                 :autocomplete="autocomplete" :required="required" @input="handleInput" />
-            <button v-if="showPasswordToggle" type="button" class="password-toggle" @click="$emit('toggle-password')">
-                {{ showPassword ? '👁️‍🗨️' : '👁️‍🗨️' }}
+            <button v-if="showPasswordToggle" type="button" class="password-toggle" @click="toggleShowPassword">
+                {{ input.showPassword ? '👁️‍🗨️' : '👁️‍🗨️' }}
             </button>
         </div>
         <div v-if="errorMessage" class="error-message">
@@ -16,73 +16,85 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
+import { defineComponent, type PropType } from 'vue'
+
+interface InputState {
+    showPassword: boolean
+}
 
 export default defineComponent({
     name: 'FormInput',
     props: {
         id: {
-            type: String,
+            type: String as PropType<string>,
             required: true
         },
         modelValue: {
-            type: String,
+            type: String as PropType<string>,
             required: true
         },
         label: {
-            type: String,
+            type: String as PropType<string>,
             default: ''
         },
         type: {
-            type: String,
+            type: String as PropType<string>,
             default: 'text'
         },
         placeholder: {
-            type: String,
+            type: String as PropType<string>,
             default: ''
         },
         maxlength: {
-            type: Number,
+            type: Number as PropType<number>,
             default: undefined
         },
         autocomplete: {
-            type: String,
+            type: String as PropType<string>,
             default: ''
         },
         required: {
-            type: Boolean,
+            type: Boolean as PropType<boolean>,
             default: false
         },
         icon: {
-            type: String,
+            type: String as PropType<string>,
             default: ''
         },
         showPasswordToggle: {
-            type: Boolean,
-            default: false
-        },
-        showPassword: {
-            type: Boolean,
+            type: Boolean as PropType<boolean>,
             default: false
         },
         errorMessage: {
-            type: String,
+            type: String as PropType<string>,
             default: ''
         }
     },
     emits: ['update:modelValue', 'toggle-password'],
+    data(): { input: InputState } {
+        return {
+            input: {
+                showPassword: true
+            }
+        }
+    },
     computed: {
-        inputType() {
+        inputType(): string {
             if (this.showPasswordToggle) {
-                return this.showPassword ? 'text' : 'password'
+                return this.input.showPassword ? 'text' : 'password'
             }
             return this.type
         }
     },
     methods: {
+        // 处理输入
         handleInput(event: Event) {
             const target = event.target as HTMLInputElement
             this.$emit('update:modelValue', target.value)
+        },
+        // 反转密码显示
+        toggleShowPassword(): void {
+            this.input.showPassword = !this.input.showPassword
         }
     }
 })
