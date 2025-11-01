@@ -187,6 +187,8 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <!-- 保留参数名信息，供 Spring @PathVariable 等注解使用 -->
+                    <parameters>true</parameters>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

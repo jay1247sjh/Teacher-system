@@ -21,6 +21,7 @@ public class TableAssembler {
         po.setId(tableId);
         po.setTableFullName(table.getTableFullName());
         po.setTableAliasName(table.getTableAliasName());
+        // createTime 由数据库自动填充，不需要手动设置
         return po;
     }
 

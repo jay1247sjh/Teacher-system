@@ -5,6 +5,8 @@ import com.txq.common.interceptor.TraceIdInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -16,6 +18,21 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private final TraceIdInterceptor traceIdInterceptor;
     private final JwtAuthenticationInterceptor jwtAuthenticationInterceptor;
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        // 禁用后缀匹配，避免 /table/123/fields 被当作静态资源
+        configurer.setUseTrailingSlashMatch(false);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 只处理明确的静态资源路径，不处理 /table/** 等 API 路径
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/public/**")
+                .addResourceLocations("classpath:/public/");
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

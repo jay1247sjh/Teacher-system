@@ -23,7 +23,17 @@
             <details open>
               <summary class="tree-title clickable">表格列表</summary>
               <ul>
-                <li class="tree-leaf clickable">校级项目EH4</li>
+                <li 
+                  v-for="table in tableList" 
+                  :key="table.tableId" 
+                  class="tree-leaf clickable"
+                  @click="goToTableDetail(table.tableId)"
+                >
+                  {{ table.tableFullName }}
+                </li>
+                <li v-if="tableList.length === 0" class="tree-leaf tree-leaf-empty">
+                  暂无表格
+                </li>
               </ul>
             </details>
           </li>
@@ -50,11 +60,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-
+import { defineComponent, provide } from 'vue';
+import { getTableList, type TableListItem } from '@/api/table';
+import { ElMessage } from 'element-plus';
 
 export default defineComponent({
   name: 'TableLayout',
+  data() {
+    return {
+      tableList: [] as TableListItem[]
+    }
+  },
+  mounted() {
+    this.loadTableList();
+  },
+  created() {
+    // 提供刷新表格列表的方法给子组件
+    provide('refreshTableList', this.loadTableList);
+  },
   methods: {
     gotoHome(): void {
       this.$router.push({ name: 'HomeWelcome' });
@@ -64,6 +87,20 @@ export default defineComponent({
     },
     goToAccountManager(): void {
       this.$router.push({ name: 'AccountManagement' });
+    },
+    goToTableDetail(tableId: number): void {
+      this.$router.push({ 
+        name: 'TableDetail', 
+        params: { id: tableId } 
+      });
+    },
+    async loadTableList(): Promise<void> {
+      try {
+        this.tableList = await getTableList();
+      } catch (error) {
+        console.error('加载表格列表失败:', error);
+        ElMessage.error('加载表格列表失败');
+      }
     }
   }
 })
@@ -180,6 +217,17 @@ details summary {
   padding: $spacing-xs 0 $spacing-xs $spacing-sm;
   border-radius: $border-radius-small;
   transition: background-color 0.2s, color 0.2s;
+}
+
+.tree-leaf-empty {
+  color: $text-muted;
+  font-style: italic;
+  cursor: default !important;
+  
+  &:hover {
+    color: $text-muted !important;
+    background: transparent !important;
+  }
 }
 
 /* 响应式：平板及以下 */

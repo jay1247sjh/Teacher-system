@@ -28,6 +28,12 @@ const routes = [
                 name: 'AccountManagement',
                 component: () => import('@/views/main/account-management.vue'),
                 meta: { requiresAuth: true }
+            },
+            {
+                path: 'table/:id',
+                name: 'TableDetail',
+                component: () => import('@/views/main/table-detail.vue'),
+                meta: { requiresAuth: true }
             }
         ]
     },

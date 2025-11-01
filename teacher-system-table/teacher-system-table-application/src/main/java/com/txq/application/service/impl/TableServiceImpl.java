@@ -2,6 +2,8 @@ package com.txq.application.service.impl;
 
 import com.txq.application.entity.query.TableFieldQuery;
 import com.txq.application.entity.query.TableQuery;
+import com.txq.application.entity.vo.TableFieldVO;
+import com.txq.application.entity.vo.TableListItemVO;
 import com.txq.application.service.ITableService;
 import com.txq.domain.infra.repository.TableRepository;
 import com.txq.domain.model.Table;
@@ -10,7 +12,9 @@ import com.txq.domain.service.TableDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -68,5 +72,41 @@ public class TableServiceImpl implements ITableService {
      */
     private Integer generateTableId() {
         return Math.abs(random.nextInt());
+    }
+
+    /**
+     * 获取表格列表
+     */
+    @Override
+    public List<TableListItemVO> getTableList() {
+        // 从仓储层获取表格列表
+        List<Map<String, Object>> tables = tableRepository.findAllTables();
+        
+        // 转换为VO
+        return tables.stream().map(table -> TableListItemVO.builder()
+                .tableId((Integer) table.get("tableId"))
+                .tableFullName((String) table.get("tableFullName"))
+                .tableAliasName((String) table.get("tableAliasName"))
+                .fieldCount((Integer) table.get("fieldCount"))
+                .createTime((LocalDateTime) table.get("createTime"))
+                .build()
+        ).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取表格字段列表
+     */
+    @Override
+    public List<TableFieldVO> getTableFields(Integer tableId) {
+        // 从仓储层获取字段列表
+        List<Map<String, Object>> fields = tableRepository.findTableFields(tableId);
+        
+        // 转换为VO
+        return fields.stream().map(field -> TableFieldVO.builder()
+                .root((Boolean) field.get("root"))
+                .fieldName((String) field.get("fieldName"))
+                .isCalc((Boolean) field.get("isCalc"))
+                .build()
+        ).collect(Collectors.toList());
     }
 }

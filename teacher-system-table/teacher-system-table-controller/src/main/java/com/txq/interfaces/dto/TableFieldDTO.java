@@ -5,18 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 表格字段DTO
+ * 表格字段数据传输对象
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TableFieldDTO {
-    // 管理员操作字段
-    private boolean root;
-
-    // 字段名称
+    private Boolean root;
     private String fieldName;
-
-    // 是否为计算字段
-    private boolean isCalc;
+    private Boolean isCalc;
 }

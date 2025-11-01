@@ -142,6 +142,7 @@ interface ValidationErrors {
 
 export default defineComponent({
     name: 'TableManagement',
+    inject: ['refreshTableList'],
     data() {
         // 尝试从 sessionStorage 恢复数据
         const savedData = sessionStorage.getItem('tableManagementFormData')
@@ -319,6 +320,17 @@ export default defineComponent({
                 
                 // 重置表单
                 this.resetForm();
+                
+                // 调用父组件的刷新方法更新表格列表
+                if (this.refreshTableList && typeof this.refreshTableList === 'function') {
+                    (this.refreshTableList as () => void)();
+                }
+                
+                // 延迟跳转，让用户看到成功提示
+                setTimeout(() => {
+                    // 跳转到首页
+                    this.$router.push({ name: 'HomeWelcome' });
+                }, 1000);
             } catch (error: any) {
                 console.error('创建表格失败:', error);
                 console.error('错误详情:', error.message, error.response);
