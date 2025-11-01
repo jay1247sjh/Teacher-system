@@ -99,10 +99,12 @@ export default defineComponent({
 
                 console.log('登录接口返回的数据:', userInfo)
                 console.log('Token值:', userInfo.token)
+                console.log('权限列表:', userInfo.permissions)
 
-                // 保存token和用户信息
-                localStorage.setItem('token', userInfo.token)
-                localStorage.setItem('userInfo', JSON.stringify(userInfo))
+                // 使用 Pinia store 保存用户信息
+                const { useUserStore } = await import('@/store/user')
+                const userStore = useUserStore()
+                userStore.setUserInfo(userInfo)
 
                 // 处理"记住我"功能
                 if (this.loginForm.rememberMe) {
@@ -112,10 +114,6 @@ export default defineComponent({
                     // 如果没有勾选，清除之前保存的信息
                     this.clearCredentials()
                 }
-
-                // 验证是否保存成功
-                const savedToken = localStorage.getItem('token')
-                console.log('保存后的token:', savedToken)
 
                 // 登录成功提示
                 ElMessage.success('登录成功！')

@@ -9,6 +9,8 @@ import com.txq.application.service.IUserService;
 import com.txq.common.exception.BizException;
 import com.txq.domain.event.SendMailEvent;
 import com.txq.domain.infra.notice.MailService;
+import com.txq.domain.infra.repository.PermissionRepository;
+import com.txq.domain.infra.repository.UserAvatarRepository;
 import com.txq.domain.infra.repository.UserRepository;
 import com.txq.domain.infra.repository.UserRoleRepository;
 import com.txq.domain.infra.security.PasswordEncryptor;
@@ -26,6 +28,7 @@ import java.security.PrivateKey;
 import java.time.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.txq.common.result.Response.ResultCode.BUSINESS_ERROR;
@@ -53,6 +56,12 @@ public class UserServiceImpl implements IUserService {
 
     // 用户角色信息存储类
     private final UserRoleRepository userRoleRepository;
+
+    // 权限信息存储类
+    private final PermissionRepository permissionRepository;
+    
+    // 用户头像存储类
+    private final UserAvatarRepository userAvatarRepository;
 
     // 密码加密类
     private final PasswordEncryptor passwordEncryptor;
@@ -121,10 +130,16 @@ public class UserServiceImpl implements IUserService {
             String privateKey = keyPairConfig.getPrivateKey();
             // 还原为私钥对象
             PrivateKey privatekey = KeyUtils.getPrivatekey(privateKey);
+            // 获取用户角色ID列表
+            List<Integer> roleIds = userRoleRepository.getRoleIdById(id.getId());
+            
+            // 获取用户权限列表（根据角色查询）
+            List<String> permissions = permissionRepository.getPermsByRoleIds(roleIds);
+            
             // 添加用户额外信息
             Map<String, Object> personalInfo = new HashMap<>();
             // 存入用户角色id
-            personalInfo.put("roleId", userRoleRepository.getRoleIdById(id.getId()));
+            personalInfo.put("roleId", roleIds);
             // 生成Token
             String token = JwtUtils.generateToken(
                     privatekey,
@@ -135,14 +150,17 @@ public class UserServiceImpl implements IUserService {
                     personalInfo,
                     null
             );
-            // 生成用户信息视图
+            // 获取用户头像
+            String avatarPath = userAvatarRepository.getAvatarPathByUserId(id.getId());
+            
+            // 生成用户信息视图（只返回权限，不返回角色）
             return new UserVO(
                     token,
                     Date.from(Instant.now().plus(Duration.ofMinutes(expireTime))).toInstant(),
                     id.getId(),
                     userRepository.getUsernameById(id.getId()),
-                    null,
-                    null,
+                    avatarPath,  // 返回头像路径
+                    permissions,  // 只返回权限标识列表，前端基于权限判断
                     null
             );
         } catch (Exception e) {

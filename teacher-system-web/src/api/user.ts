@@ -35,9 +35,9 @@ export interface UserVO {
     expireAt: string        // 令牌过期时间
     wordId: string          // 用户工号
     username: string        // 用户名
-    avatar: string          // 用户头像
-    permissions: string[]   // 用户权限列表
-    route: RouteVO          // 动态路由树
+    avatar?: string         // 用户头像
+    permissions: string[]   // 用户权限标识列表（基于RBAC）
+    route?: RouteVO         // 动态路由树
 }
 
 /**
