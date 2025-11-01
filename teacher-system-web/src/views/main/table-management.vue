@@ -1,7 +1,5 @@
 <template v-if="$route.name === 'TableManagement'">
-    <!-- 右侧内容：表格管理主内容（原main-layout右半部分）移动进来，可直接复用 -->
     <section class="table-management-content flex-1 flex-column">
-        <!-- ★ 新增表格属性编辑区 -->
         <div class="table-meta-editor">
             <div class="table-meta-row">
                 <label class="meta-label">表格全称 <span class="meta-required">*</span></label>
@@ -23,13 +21,8 @@
                     </span>
                 </div>
             </div>
-            <!-- 可扩展更多属性，如描述等：
-        <div class="table-meta-row">
-          <label class="meta-label">描述</label>
-          <textarea class="meta-input meta-textarea" v-model="tableMeta.desc" maxlength="40" placeholder="选填，表格描述..." />
-        </div> -->
+
         </div>
-        <!-- 原有表结构自定义区域及真实表结构展示区域不动 -->
         <div class="table-structure-editor">
             <div class="editor-header flex-between">
                 <span class="editor-title">表结构自定义</span>
@@ -42,11 +35,9 @@
                     <small class="field-type-tag" :class="{ 'chip-disabled': !field.editable }">{{
                         field.type === 'content' ? '内容' : '计算' }}</small>
                     <span v-if="!field.editable" class="field-non-edit" title="仅管理员可操作">🔒</span>
-                    <!-- 删除按钮仅在hover且允许删除时出现 -->
                     <span class="chip-delete-btn" title="删除" @click.stop="removeField(idx)">×</span>
                 </span>
             </div>
-            <!-- 新增: 自定义风格select和多选框 -->
             <div v-if="showDialog" class="field-dialog-bg">
                 <div class="field-dialog">
                     <h4 class="dialog-title">{{ dialogMode === 'edit' ? '编辑字段' : '添加新字段' }}</h4>
@@ -65,7 +56,6 @@
                                 计算字段</li>
                         </ul>
                     </div>
-                    <!-- 仅当type为计算字段时显示内容字段多选 -->
                     <div v-if="fieldForm.type === 'calc'" class="depends-section">
                         <div class="dialog-label depends-label">依赖内容字段 <span class="meta-required">*</span></div>
                         <div class="depends-chips">
@@ -92,7 +82,6 @@
                 </div>
             </div>
         </div>
-        <!-- 下半表结构仅显示表头，特殊字段有样式标识 -->
         <div class="table-structure-preview-minimal">
             <div class="table-name-header">
                 <span class="table-name-main">

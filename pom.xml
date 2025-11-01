@@ -11,6 +11,7 @@
         <module>teacher-system-common</module>
         <module>teacher-system-gateway</module>
         <module>teacher-system-user</module>
+        <module>teacher-system-table</module>
     </modules>
 
     <properties>

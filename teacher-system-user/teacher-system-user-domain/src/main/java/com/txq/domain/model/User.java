@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * 注册领域模型
+ * 用户领域模型
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +26,9 @@ public class User {
     // 邮箱
     private Email email;
 
+    /**
+     * 创建User领域根
+     */
     public static User create(String id, String username, String rawPassword, String email,
                               PasswordEncryptor passwordEncryptor) {
         return new User(

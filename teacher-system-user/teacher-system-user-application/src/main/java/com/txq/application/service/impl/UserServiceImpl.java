@@ -33,7 +33,7 @@ import static com.txq.domain.status.ErrorCode.ACCOUNT_NOT_EXIST_ERROR_CODE;
 import static com.txq.domain.status.ErrorCode.PASSWORD_ERROR_CODE;
 
 /**
- * 登录注册应用类
+ * 用户信息应用类
  */
 @Service
 @RequiredArgsConstructor

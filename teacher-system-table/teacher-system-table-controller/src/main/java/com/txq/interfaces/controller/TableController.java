@@ -1,0 +1,28 @@
+package com.txq.interfaces.controller;
+
+import com.txq.application.service.ITableService;
+import com.txq.common.annotation.ApiRequestMapping;
+import com.txq.common.result.Response;
+import com.txq.interfaces.converter.TableConverter;
+import com.txq.interfaces.dto.TableDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+/**
+ * 表格控制器
+ */
+@ApiRequestMapping("/table")
+@RequiredArgsConstructor
+public class TableController {
+
+    private final ITableService tableService;
+
+    @PostMapping("/create-table")
+    public Response<String> createTable(@RequestBody TableDTO tableDTO) {
+        tableService.createTable(
+                TableConverter.INSTANCE.toQuery(tableDTO)
+        );
+        return Response.success("创建成功");
+    }
+}

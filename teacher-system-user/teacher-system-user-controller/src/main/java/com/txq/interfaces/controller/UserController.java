@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * 登录注册控制器
+ * 用户控制器
  */
 @ApiRequestMapping("/user")
 @RequiredArgsConstructor

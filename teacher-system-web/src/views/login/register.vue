@@ -19,7 +19,8 @@
 
                 <form class="register-form" @submit.prevent="handleRegister">
                     <FormInput id="employeeId" v-model="registerForm.employeeId" label="工号" placeholder="请输入10位工号"
-                        :maxlength="10" autocomplete="username" icon="id" required />
+                        :maxlength="10" autocomplete="username" icon="id" 
+                        :error-message="employeeIdError ? '工号必须是10位数字' : ''" required />
 
                     <FormInput id="password" v-model="registerForm.password" label="密码" placeholder="请输入密码"
                         autocomplete="new-password" icon="lock" show-password-toggle required />
@@ -55,6 +56,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { ElMessage } from 'element-plus'
 import FormInput from "@/components/FormInput.vue";
 import EmailCodeInput from "@/components/CodeInput.vue";
 
@@ -108,6 +110,16 @@ export default defineComponent({
         };
     },
     computed: {
+        // 判断工号格式是否正确
+        employeeIdError(): boolean {
+            const id = this.registerForm.employeeId.trim();
+            // 如果工号为空，不显示错误
+            if (id === '') {
+                return false;
+            }
+            // 工号必须是10位数字
+            return id.length !== this.EMPLOYEE_ID_LENGTH || !/^\d+$/.test(id);
+        },
         // 判断两次输入密码是否相同
         passwordMismatch(): boolean {
             const { password, confirmPassword } = this.registerForm
@@ -133,12 +145,14 @@ export default defineComponent({
             const form = this.registerForm
             return (
                 form.employeeId.length === this.EMPLOYEE_ID_LENGTH &&
+                !this.employeeIdError &&
                 form.password.trim() !== "" &&
                 form.confirmPassword.trim() !== "" &&
                 form.name.trim() !== "" &&
                 form.email.trim() !== "" &&
                 form.emailCode.trim() !== "" &&
                 !this.passwordMismatch &&
+                !this.emailError &&
                 !this.codeError
             )
         },
@@ -146,17 +160,69 @@ export default defineComponent({
     methods: {
         // 发送验证码
         async sendEmailCode(): Promise<void> {
-            // 设置倒计时并开始倒计
-            this.countdown = 60;
-            let timer = setInterval(() => {
-                this.countdown--;
-                if (this.countdown <= 0) {
-                    clearInterval(timer);
-                }
-            }, 1000);
+            if (this.countdown > 0) {
+                return
+            }
+
+            try {
+                // 调用发送验证码API
+                const { sendCode } = await import('@/api/user')
+                await sendCode({
+                    username: this.registerForm.name,
+                    email: this.registerForm.email
+                })
+
+                ElMessage.success('验证码已发送到您的邮箱，请注意查收')
+
+                // 设置倒计时并开始倒计
+                this.countdown = 60
+                const timer = setInterval(() => {
+                    this.countdown--
+                    if (this.countdown <= 0) {
+                        clearInterval(timer)
+                    }
+                }, 1000)
+            } catch (error: any) {
+                console.error('发送验证码失败:', error)
+                // 错误提示已经在request拦截器中处理了
+            }
         },
+
         // 注册
-        async handleRegister(): Promise<void> { },
+        async handleRegister(): Promise<void> {
+            if (!this.isFormValid) {
+                ElMessage.warning('请填写完整的注册信息')
+                return
+            }
+
+            this.loading = true
+
+            try {
+                // 调用注册API
+                const { register } = await import('@/api/user')
+                await register({
+                    id: this.registerForm.employeeId,
+                    username: this.registerForm.name,
+                    password: this.registerForm.password,
+                    email: this.registerForm.email,
+                    code: this.registerForm.emailCode
+                })
+
+                // 注册成功提示
+                ElMessage.success('注册成功！请登录')
+
+                // 跳转到登录页
+                setTimeout(() => {
+                    this.$router.push('/login')
+                }, 500)
+            } catch (error: any) {
+                console.error('注册失败:', error)
+                // 错误提示已经在request拦截器中处理了
+                this.codeError = true
+            } finally {
+                this.loading = false
+            }
+        },
     },
 });
 </script>
@@ -362,10 +428,6 @@ export default defineComponent({
 
             input {
                 @include input-base;
-            }
-
-            .password-toggle {
-                @include password-toggle;
             }
         }
 

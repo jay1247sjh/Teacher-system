@@ -47,6 +47,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { ElMessage } from 'element-plus'
 import FormInput from '@/components/FormInput.vue'
 
 interface LoginForm {
@@ -74,24 +75,38 @@ export default defineComponent({
         }
     },
     methods: {
-        async handleLogin(): Promise<void> {
+        async handleLogin(event: Event): Promise<void> {
+            event.preventDefault()
+
             if (!this.loginForm.username || !this.loginForm.password) {
+                ElMessage.warning('请输入用户名和密码')
                 return
             }
 
             this.loading = true
 
             try {
-                // 这里添加登录逻辑
-                console.log('登录信息:', this.loginForm)
+                // 调用登录API
+                const { login } = await import('@/api/user')
+                const userInfo = await login({
+                    id: this.loginForm.username,
+                    password: this.loginForm.password
+                })
 
-                // 模拟API调用
-                await new Promise((resolve) => setTimeout(resolve, 1000))
+                // 保存token和用户信息
+                localStorage.setItem('token', userInfo.token)
+                localStorage.setItem('userInfo', JSON.stringify(userInfo))
 
-                // 登录成功后的处理
-                console.log('登录成功')
-            } catch (error) {
+                // 登录成功提示
+                ElMessage.success('登录成功！')
+
+                // 跳转到首页
+                setTimeout(() => {
+                    this.$router.push('/home')
+                }, 500)
+            } catch (error: any) {
                 console.error('登录失败:', error)
+                // 错误提示已经在request拦截器中处理了
             } finally {
                 this.loading = false
             }
@@ -268,10 +283,6 @@ export default defineComponent({
 
             input {
                 @include input-base;
-            }
-
-            .password-toggle {
-                @include password-toggle;
             }
         }
     }

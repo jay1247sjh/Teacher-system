@@ -6,7 +6,7 @@ import com.txq.application.entity.query.UserQuery;
 import com.txq.application.entity.vo.UserVO;
 
 /**
- * 登录注册接口
+ * 用户信息接口
  */
 public interface IUserService {
     /**

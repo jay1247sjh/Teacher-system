@@ -6,7 +6,12 @@
             <input :id="id" :value="modelValue" :type="inputType" :placeholder="placeholder" :maxlength="maxlength"
                 :autocomplete="autocomplete" :required="required" @input="handleInput" />
             <button v-if="showPasswordToggle" type="button" class="password-toggle" @click="toggleShowPassword">
-                {{ input.showPassword ? '👁️‍🗨️' : '👁️‍🗨️' }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path v-if="!input.showPassword" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle v-if="!input.showPassword" cx="12" cy="12" r="3"></circle>
+                    <path v-if="input.showPassword" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line v-if="input.showPassword" x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
             </button>
         </div>
         <div v-if="errorMessage" class="error-message">
@@ -74,7 +79,7 @@ export default defineComponent({
     data(): { input: InputState } {
         return {
             input: {
-                showPassword: true
+                showPassword: false
             }
         }
     },
@@ -149,10 +154,35 @@ export default defineComponent({
 
         input {
             @include input-base;
+
+            // 禁用浏览器自带的密码显示/隐藏按钮
+            &::-ms-reveal,
+            &::-ms-clear {
+                display: none;
+            }
+
+            &::-webkit-credentials-auto-fill-button,
+            &::-webkit-contacts-auto-fill-button {
+                visibility: hidden;
+                display: none !important;
+                pointer-events: none;
+                height: 0;
+                width: 0;
+                margin: 0;
+            }
         }
 
         .password-toggle {
             @include password-toggle;
+            color: $text-muted;
+            
+            svg {
+                display: block;
+            }
+
+            &:hover {
+                color: $primary-color;
+            }
         }
     }
 
