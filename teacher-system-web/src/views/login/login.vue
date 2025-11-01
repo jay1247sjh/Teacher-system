@@ -74,6 +74,10 @@ export default defineComponent({
             loading: false
         }
     },
+    mounted() {
+        // 从 localStorage 读取记住的登录信息
+        this.loadRememberedCredentials()
+    },
     methods: {
         async handleLogin(event: Event): Promise<void> {
             event.preventDefault()
@@ -93,16 +97,42 @@ export default defineComponent({
                     password: this.loginForm.password
                 })
 
+                console.log('登录接口返回的数据:', userInfo)
+                console.log('Token值:', userInfo.token)
+
                 // 保存token和用户信息
                 localStorage.setItem('token', userInfo.token)
                 localStorage.setItem('userInfo', JSON.stringify(userInfo))
 
+                // 处理"记住我"功能
+                if (this.loginForm.rememberMe) {
+                    // 如果勾选了"记住我"，保存用户名和密码
+                    this.saveCredentials()
+                } else {
+                    // 如果没有勾选，清除之前保存的信息
+                    this.clearCredentials()
+                }
+
+                // 验证是否保存成功
+                const savedToken = localStorage.getItem('token')
+                console.log('保存后的token:', savedToken)
+
                 // 登录成功提示
                 ElMessage.success('登录成功！')
 
-                // 跳转到首页
+                // 获取重定向路径
+                const redirect = this.$route.query.redirect as string
+                console.log('登录成功，重定向路径:', redirect)
+                
+                // 跳转到保存的页面或首页
                 setTimeout(() => {
-                    this.$router.push('/home')
+                    if (redirect && redirect !== '/login' && redirect !== '/register') {
+                        console.log('跳转到:', redirect)
+                        this.$router.push(redirect)
+                    } else {
+                        console.log('跳转到首页')
+                        this.$router.push('/home')
+                    }
                 }, 500)
             } catch (error: any) {
                 console.error('登录失败:', error)
@@ -110,6 +140,51 @@ export default defineComponent({
             } finally {
                 this.loading = false
             }
+        },
+        
+        /**
+         * 保存登录凭据到 localStorage
+         */
+        saveCredentials(): void {
+            // 使用 Base64 编码密码（简单加密，不是完全安全的方案）
+            const encodedPassword = btoa(this.loginForm.password)
+            
+            localStorage.setItem('rememberedUsername', this.loginForm.username)
+            localStorage.setItem('rememberedPassword', encodedPassword)
+            localStorage.setItem('rememberMe', 'true')
+        },
+        
+        /**
+         * 从 localStorage 加载记住的凭据
+         */
+        loadRememberedCredentials(): void {
+            const rememberMe = localStorage.getItem('rememberMe')
+            
+            if (rememberMe === 'true') {
+                const username = localStorage.getItem('rememberedUsername')
+                const encodedPassword = localStorage.getItem('rememberedPassword')
+                
+                if (username && encodedPassword) {
+                    this.loginForm.username = username
+                    // Base64 解码密码
+                    try {
+                        this.loginForm.password = atob(encodedPassword)
+                    } catch (e) {
+                        console.error('解码密码失败:', e)
+                        this.clearCredentials()
+                    }
+                    this.loginForm.rememberMe = true
+                }
+            }
+        },
+        
+        /**
+         * 清除保存的登录凭据
+         */
+        clearCredentials(): void {
+            localStorage.removeItem('rememberedUsername')
+            localStorage.removeItem('rememberedPassword')
+            localStorage.removeItem('rememberMe')
         }
     }
 })

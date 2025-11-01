@@ -48,5 +48,15 @@
             <artifactId>lombok-mapstruct-binding</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!--Spring AOP for permission check-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <!--JWT工具包-->
+        <dependency>
+            <groupId>sjh.jwt</groupId>
+            <artifactId>jwt-utils</artifactId>
+        </dependency>
     </dependencies>
 </project>

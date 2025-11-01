@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios'
 import { ElMessage } from 'element-plus'
+import router from '@/router'
 
 /**
  * 后端统一响应格式
@@ -31,8 +32,13 @@ request.interceptors.request.use(
     (config) => {
         // 从localStorage获取token
         const token = localStorage.getItem('token')
+        console.log('[Request] 请求URL:', config.url)
+        console.log('[Request] Token:', token)
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`
+            console.log('[Request] Authorization头:', config.headers.Authorization)
+        } else {
+            console.log('[Request] 未设置Authorization头，原因:', !token ? 'token为空' : 'headers不存在')
         }
         return config
     },
@@ -56,10 +62,46 @@ request.interceptors.response.use(
         } else {
             // 业务错误
             const errorMsg = res.msg || '请求失败'
-            console.error('[Request] Business error:', errorMsg)
+            console.error('[Request] Business error, code:', res.code, 'msg:', errorMsg)
             
-            // 显示错误提示
-            ElMessage.error(errorMsg)
+            // 只在特定的认证错误码时才清除token并跳转
+            // 401: 未授权（token无效/过期）
+            // 403: 禁止访问（可能是token相关）
+            const isAuthError = res.code === 401 || res.code === 403
+            
+            if (isAuthError) {
+                // 认证错误：清除token并跳转到登录页
+                console.log('检测到认证错误，清除token并跳转登录页')
+                console.log('当前 token:', localStorage.getItem('token'))
+                console.log('调用栈:', new Error().stack)
+                ElMessage.error('登录已过期，请重新登录')
+                localStorage.removeItem('token')
+                localStorage.removeItem('userInfo')
+                console.log('Token已清除')
+                
+                // 获取当前路径（排除登录和注册页）
+                const currentPath = window.location.pathname
+                const currentRoute = router.currentRoute.value
+                
+                // 只在不是登录页时才跳转
+                if (currentRoute.name !== 'Login' && currentRoute.name !== 'Register') {
+                    // 使用 window.location.href 强制完整跳转，避免 keep-alive 缓存问题
+                    const fullPath = currentPath + window.location.search
+                    const redirectUrl = `/login?redirect=${encodeURIComponent(fullPath)}`
+                    console.log('Token失效，跳转到登录页，保存路径:', fullPath)
+                    window.location.href = redirectUrl
+                }
+            } else {
+                // 其他业务错误：显示错误提示
+                console.log('显示业务错误提示:', errorMsg)
+                try {
+                    ElMessage.error(errorMsg)
+                    console.log('ElMessage.error 调用成功')
+                } catch (e) {
+                    console.error('ElMessage.error 调用失败:', e)
+                    alert(errorMsg) // 备用方案
+                }
+            }
             
             return Promise.reject(new Error(errorMsg))
         }
@@ -77,11 +119,23 @@ request.interceptors.response.use(
                     errorMessage = data?.msg || '请求参数错误'
                     break
                 case 401:
-                    errorMessage = '未授权，请重新登录'
-                    // 清除token并跳转到登录页
+                    errorMessage = data?.msg || '登录已过期，请重新登录'
+                    // 清除token并跳转到登录页，保存当前路径
                     localStorage.removeItem('token')
                     localStorage.removeItem('userInfo')
-                    window.location.href = '/login'
+                    
+                    // 获取当前路径
+                    const currentPath = window.location.pathname
+                    const currentRoute = router.currentRoute.value
+                    
+                    // 只在不是登录页时才跳转
+                    if (currentRoute.name !== 'Login' && currentRoute.name !== 'Register') {
+                        // 使用 window.location.href 强制完整跳转，避免 keep-alive 缓存问题
+                        const fullPath = currentPath + window.location.search
+                        const redirectUrl = `/login?redirect=${encodeURIComponent(fullPath)}`
+                        console.log('Token失效(401)，跳转到登录页，保存路径:', fullPath)
+                        window.location.href = redirectUrl
+                    }
                     break
                 case 403:
                     errorMessage = '没有权限访问'

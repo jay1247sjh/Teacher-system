@@ -3,34 +3,52 @@
         <div class="table-meta-editor">
             <div class="table-meta-row">
                 <label class="meta-label">表格全称 <span class="meta-required">*</span></label>
-                <input type="text" class="meta-input" v-model="tableMeta.fullName" maxlength="20"
-                    placeholder="请输入表格全称" />
+                <input 
+                    type="text" 
+                    class="meta-input" 
+                    :class="{ 'input-error': validationErrors.fullName }"
+                    v-model="tableMeta.fullName" 
+                    maxlength="64"
+                    placeholder="请输入表格全称" 
+                    @blur="validateFullName"
+                />
             </div>
+            <div v-if="validationErrors.fullName" class="error-message">{{ validationErrors.fullName }}</div>
+            
             <div class="table-meta-row">
-                <label class="meta-label">表格别名 <span class="meta-required">*</span></label>
-                <input type="text" class="meta-input" v-model="tableMeta.alias" maxlength="16"
-                    placeholder="请输入别名（唯一标识）" />
+                <label class="meta-label">表格别称 <span class="meta-required">*</span></label>
+                <input 
+                    type="text" 
+                    class="meta-input" 
+                    :class="{ 'input-error': validationErrors.alias }"
+                    v-model="tableMeta.alias" 
+                    maxlength="32"
+                    placeholder="请输入别名（唯一标识）" 
+                    @blur="validateAlias"
+                />
             </div>
+            <div v-if="validationErrors.alias" class="error-message">{{ validationErrors.alias }}</div>
+            
             <div class="table-meta-row">
-                <label class="meta-label">可见成员</label>
-                <div class="visibleto-chips">
-                    <span v-for="role in visibleRoles" :key="role.val" class="visible-chip"
-                        :class="{ selected: tableMeta.visibleTo.includes(role.val) }"
-                        @click="toggleVisibleTo(role.val)">
-                        {{ role.label }}
-                    </span>
-                </div>
+                <label class="meta-label"></label>
+                <button 
+                    type="button"
+                    class="submit-btn" 
+                    :disabled="isSubmitting || !canSubmit"
+                    @click="handleSubmit"
+                >
+                    {{ isSubmitting ? '创建中...' : '创建表格' }}
+                </button>
             </div>
-
         </div>
         <div class="table-structure-editor">
             <div class="editor-header flex-between">
                 <span class="editor-title">表结构自定义</span>
-                <button class="add-field-btn" @click="openAddDialog">+ 添加字段</button>
+                <button type="button" class="add-field-btn" @click="openAddDialog">+ 添加字段</button>
             </div>
             <div class="fields-list">
                 <span v-for="(field, idx) in fieldList" :key="field.name" class="field-chip"
-                    :class="{ 'chip-disabled': !field.editable }" @click="openEditDialog(idx, $event)">
+                    :class="{ 'chip-disabled': !field.editable }" @click="openEditDialog(idx)">
                     {{ field.name }}
                     <small class="field-type-tag" :class="{ 'chip-disabled': !field.editable }">{{
                         field.type === 'content' ? '内容' : '计算' }}</small>
@@ -38,6 +56,7 @@
                     <span class="chip-delete-btn" title="删除" @click.stop="removeField(idx)">×</span>
                 </span>
             </div>
+            <div v-if="validationErrors.fields" class="error-message" style="margin-top: 10px;">{{ validationErrors.fields }}</div>
             <div v-if="showDialog" class="field-dialog-bg">
                 <div class="field-dialog">
                     <h4 class="dialog-title">{{ dialogMode === 'edit' ? '编辑字段' : '添加新字段' }}</h4>
@@ -52,20 +71,15 @@
                         <ul v-if="selOpen" class="custom-select-dropdown">
                             <li :class="{ selected: fieldForm.type === 'content' }"
                                 @click.stop="changeFieldType('content')">内容字段</li>
-                            <li :class="{ selected: fieldForm.type === 'calc' }" @click.stop="changeFieldType('calc')">
+                            <li :class="{ selected: fieldForm.type === 'calc', disabled: hasCalcField && dialogMode === 'add' }" 
+                                @click.stop="changeFieldType('calc')"
+                                :title="hasCalcField && dialogMode === 'add' ? '一个表只能有一个计算字段' : ''">
                                 计算字段</li>
                         </ul>
                     </div>
-                    <div v-if="fieldForm.type === 'calc'" class="depends-section">
-                        <div class="dialog-label depends-label">依赖内容字段 <span class="meta-required">*</span></div>
-                        <div class="depends-chips">
-                            <span v-for="f in contentFieldList" :key="f.name" class="depends-chip"
-                                :class="{ selected: fieldForm.dependsOn?.includes(f.name) }"
-                                @click.stop="toggleDepends(f.name)">
-                                {{ f.name }}
-                            </span>
-                            <span v-if="!contentFieldList.length" class="no-content-tip">无内容字段可选</span>
-                        </div>
+                    <div v-if="fieldForm.type === 'calc'" class="calc-field-notice">
+                        <span class="notice-icon">ℹ️</span>
+                        <span class="notice-text">计算字段用于存储计算结果（每个表只能有一个计算字段）</span>
                     </div>
                     <div class="dialog-checkbox-row">
                         <label>
@@ -74,8 +88,8 @@
                         </label>
                     </div>
                     <div class="dialog-actions flex-between">
-                        <button class="btn-outline" @click="resetDialog">取消</button>
-                        <button class="btn-primary" :disabled="!isValidFieldName || disableCalcFieldAdd"
+                        <button type="button" class="btn-outline" @click="resetDialog">取消</button>
+                        <button type="button" class="btn-primary" :disabled="!isValidFieldName || disableCalcFieldAdd"
                             @click="dialogMode === 'edit' ? confirmEdit() : addField()">确定</button>
                     </div>
                     <div v-if="showFieldExists" class="dialog-warning">字段已存在</div>
@@ -95,8 +109,6 @@
                         <th v-for="field in fieldList" :key="field.name" :class="{ 'th-disabled': !field.editable }">
                             <span>{{ field.name }}</span>
                             <small class="th-type">({{ field.type === 'content' ? '内容' : '计算' }})</small>
-                            <span v-if="field.type === 'calc' && field.dependsOn && field.dependsOn.length"
-                                class="th-depends">依赖: {{ field.dependsOn.join('、') }}</span>
                             <span v-if="!field.editable" class="th-non-edit" title="仅管理员可操作">🔒</span>
                         </th>
                     </tr>
@@ -108,7 +120,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import TableLayout from '@/layouts/TableLayout.vue';
+import { ElMessage } from 'element-plus';
+import { createTable, type TableDTO } from '@/api/table';
 
 // 类型定义
 interface FieldDef {
@@ -120,35 +133,51 @@ interface FieldDef {
 interface TableMeta {
     fullName: string;
     alias: string;
-    visibleTo: string[];
 }
-interface VisibleRole {
-    val: string;
-    label: string;
+interface ValidationErrors {
+    fullName?: string;
+    alias?: string;
+    fields?: string;
 }
 
 export default defineComponent({
-    name: 'Home',
-    components: { TableLayout },
+    name: 'TableManagement',
     data() {
+        // 尝试从 sessionStorage 恢复数据
+        const savedData = sessionStorage.getItem('tableManagementFormData')
+        let initialData = {
+            tableMeta: { fullName: '', alias: '' } as TableMeta,
+            fieldList: [] as FieldDef[]
+        }
+        
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData)
+                initialData = {
+                    tableMeta: parsed.tableMeta || initialData.tableMeta,
+                    fieldList: parsed.fieldList || initialData.fieldList
+                }
+            } catch (e) {
+                console.warn('Failed to parse saved form data:', e)
+            }
+        }
+        
         return {
             // 表格属性
-            tableMeta: {
-                fullName: '',
-                alias: '',
-                visibleTo: ['admin', 'member']
-            } as TableMeta,
-            visibleRoles: [
-                { val: 'admin', label: '管理员' },
-                { val: 'member', label: '普通成员' }
-            ] as VisibleRole[],
+            tableMeta: initialData.tableMeta,
 
             // 字段定义
-            fieldList: [
-                { name: '姓名', type: 'content', editable: true },
-                { name: '年龄', type: 'calc', editable: true, dependsOn: ['姓名'] },
-                { name: '手机号', type: 'content', editable: false }
-            ] as FieldDef[],
+            fieldList: initialData.fieldList,
+
+            // 表单验证错误
+            validationErrors: {
+                fullName: undefined,
+                alias: undefined,
+                fields: undefined
+            } as ValidationErrors,
+
+            // 提交状态
+            isSubmitting: false,
 
             // 字段编辑/弹窗状态
             showDialog: false,
@@ -165,9 +194,28 @@ export default defineComponent({
             selectEl: null as HTMLElement | null
         };
     },
+    watch: {
+        // 监听表单数据变化，自动保存到 sessionStorage
+        tableMeta: {
+            handler() {
+                this.saveFormData()
+            },
+            deep: true
+        },
+        fieldList: {
+            handler() {
+                this.saveFormData()
+            },
+            deep: true
+        }
+    },
     computed: {
         contentFieldList(): FieldDef[] {
             return this.fieldList.filter(f => f.type === 'content');
+        },
+        hasCalcField(): boolean {
+            // 检查是否已经有计算字段
+            return this.fieldList.some(f => f.type === 'calc');
         },
         isValidFieldName(): boolean {
             const val = this.fieldForm.name.trim();
@@ -180,9 +228,20 @@ export default defineComponent({
             return false;
         },
         disableCalcFieldAdd(): boolean {
+            // 如果是添加模式且已经有计算字段，则禁用
+            if (this.dialogMode === 'add' && this.fieldForm.type === 'calc' && this.hasCalcField) {
+                return true;
+            }
+            return false;
+        },
+        canSubmit(): boolean {
             return (
-                this.fieldForm.type === 'calc' &&
-                (!this.fieldForm.dependsOn || !this.fieldForm.dependsOn.length)
+                this.tableMeta.fullName.trim() !== '' &&
+                this.tableMeta.alias.trim() !== '' &&
+                this.fieldList.length > 0 &&
+                !this.validationErrors.fullName &&
+                !this.validationErrors.alias &&
+                !this.validationErrors.fields
             );
         }
     },
@@ -193,26 +252,112 @@ export default defineComponent({
         document.removeEventListener('click', this.onDocClick as any);
     },
     methods: {
-        toggleVisibleTo(val: string): void {
-            const idx = this.tableMeta.visibleTo.indexOf(val);
-            if (idx >= 0 && this.tableMeta.visibleTo.length > 1) {
-                this.tableMeta.visibleTo.splice(idx, 1);
-            } else if (idx < 0) {
-                this.tableMeta.visibleTo.push(val);
+        // 表单验证方法
+        validateFullName(): void {
+            const fullName = this.tableMeta.fullName.trim();
+            if (!fullName) {
+                this.validationErrors.fullName = '表格全称不能为空';
+            } else if (fullName.length < 2) {
+                this.validationErrors.fullName = '表格全称至少2个字符';
+            } else if (fullName.length > 64) {
+                this.validationErrors.fullName = '表格全称最多64个字符';
+            } else {
+                this.validationErrors.fullName = undefined;
             }
         },
+        validateAlias(): void {
+            const alias = this.tableMeta.alias.trim();
+            if (!alias) {
+                this.validationErrors.alias = '表格别称不能为空';
+            } else if (alias.length < 2) {
+                this.validationErrors.alias = '表格别称至少2个字符';
+            } else if (alias.length > 32) {
+                this.validationErrors.alias = '表格别称最多32个字符';
+            } else if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(alias)) {
+                this.validationErrors.alias = '别称只能包含字母、数字、下划线和中文';
+            } else {
+                this.validationErrors.alias = undefined;
+            }
+        },
+        validateFields(): void {
+            if (this.fieldList.length === 0) {
+                this.validationErrors.fields = '至少需要添加一个字段';
+            } else {
+                this.validationErrors.fields = undefined;
+            }
+        },
+        // 提交表单
+        async handleSubmit(): Promise<void> {
+            // 验证所有字段
+            this.validateFullName();
+            this.validateAlias();
+            this.validateFields();
+
+            // 检查是否有错误
+            if (!this.canSubmit) {
+                ElMessage.warning('请检查表单填写是否正确');
+                return;
+            }
+
+            // 构造请求数据
+            const tableDTO: TableDTO = {
+                tableFullName: this.tableMeta.fullName.trim(),
+                tableAliasName: this.tableMeta.alias.trim(),
+                tableFields: this.fieldList.map(field => ({
+                    root: !field.editable,  // root=true表示仅管理员可操作，即editable=false
+                    fieldName: field.name,
+                    calc: field.type === 'calc'
+                }))
+            };
+
+            try {
+                this.isSubmitting = true;
+                console.log('发送创建表格请求:', tableDTO);
+                const result = await createTable(tableDTO);
+                console.log('创建表格成功，返回结果:', result);
+                ElMessage.success('表格创建成功！');
+                
+                // 重置表单
+                this.resetForm();
+            } catch (error: any) {
+                console.error('创建表格失败:', error);
+                console.error('错误详情:', error.message, error.response);
+                // request.ts中已经显示了错误提示，这里不需要再次提示
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
+        // 保存表单数据到 sessionStorage
+        saveFormData(): void {
+            const dataToSave = {
+                tableMeta: this.tableMeta,
+                fieldList: this.fieldList
+            }
+            sessionStorage.setItem('tableManagementFormData', JSON.stringify(dataToSave))
+        },
+        // 重置表单
+        resetForm(): void {
+            this.tableMeta.fullName = '';
+            this.tableMeta.alias = '';
+            this.fieldList = [];
+            this.validationErrors = {
+                fullName: undefined,
+                alias: undefined,
+                fields: undefined
+            };
+            // 清除保存的数据
+            sessionStorage.removeItem('tableManagementFormData')
+        },
         changeFieldType(type: 'content' | 'calc'): void {
+            // 如果选择计算字段且已经存在计算字段（添加模式），显示提示
+            if (type === 'calc' && this.hasCalcField && this.dialogMode === 'add') {
+                ElMessage.warning('一个表只能有一个计算字段');
+                this.selOpen = false;
+                return;
+            }
             this.fieldForm.type = type;
             this.selOpen = false;
             if (type !== 'calc') this.fieldForm.dependsOn = [];
-        },
-        toggleDepends(name: string): void {
-            const arr = this.fieldForm.dependsOn || [];
-            if (arr.includes(name)) {
-                this.fieldForm.dependsOn = arr.filter((v: string) => v !== name);
-            } else {
-                this.fieldForm.dependsOn = [...arr, name];
-            }
         },
         openAddDialog(): void {
             this.dialogMode = 'add';
@@ -222,16 +367,20 @@ export default defineComponent({
             this.fieldForm = { name: '', type: 'content', editable: true, dependsOn: [] };
             this.selOpen = false;
         },
-        openEditDialog(idx: number, e: MouseEvent): void {
+        openEditDialog(idx: number): void {
             this.dialogMode = 'edit';
             this.showDialog = true;
             this.editingFieldIndex = idx;
             this.showFieldExists = false;
             const field = this.fieldList[idx];
-            this.fieldForm = {
-                ...field,
-                dependsOn: field.dependsOn ? [...field.dependsOn] : []
-            };
+            if (field) {
+                this.fieldForm = {
+                    name: field.name,
+                    type: field.type,
+                    editable: field.editable,
+                    dependsOn: field.dependsOn ? [...field.dependsOn] : []
+                };
+            }
             this.selOpen = false;
         },
         resetDialog(): void {
@@ -242,15 +391,23 @@ export default defineComponent({
             this.selOpen = false;
         },
         addField(): void {
-            const value = this.fieldForm.name.trim();
             if (!this.isValidFieldName || this.disableCalcFieldAdd) return;
-            this.fieldList.push({ ...this.fieldForm, dependsOn: [...(this.fieldForm.dependsOn || [])] });
+            this.fieldList.push({ 
+                name: this.fieldForm.name.trim(),
+                type: this.fieldForm.type,
+                editable: this.fieldForm.editable,
+                dependsOn: [...(this.fieldForm.dependsOn || [])] 
+            });
             this.resetDialog();
+            // 重新验证字段
+            this.validateFields();
         },
         confirmEdit(): void {
             if (!this.isValidFieldName || this.editingFieldIndex < 0 || this.disableCalcFieldAdd) return;
             this.fieldList[this.editingFieldIndex] = {
-                ...this.fieldForm,
+                name: this.fieldForm.name.trim(),
+                type: this.fieldForm.type,
+                editable: this.fieldForm.editable,
                 dependsOn: [...(this.fieldForm.dependsOn || [])]
             };
             this.resetDialog();
@@ -258,6 +415,8 @@ export default defineComponent({
         removeField(idx: number): void {
             this.fieldList.splice(idx, 1);
             if (this.editingFieldIndex === idx) this.resetDialog();
+            // 重新验证字段
+            this.validateFields();
         },
         onDocClick(e: MouseEvent): void {
             if (this.selOpen && this.selectEl && !this.selectEl.contains(e.target as Node)) {
@@ -917,6 +1076,50 @@ details summary {
     border-color: $error-color;
 }
 
+.input-error {
+    border-color: $error-color !important;
+    background: rgba($error-color, 0.05) !important;
+}
+
+.error-message {
+    color: $error-color;
+    font-size: $font-size-sm;
+    margin-top: -$spacing-sm;
+    margin-bottom: $spacing-md;
+    margin-left: 116px;  // 对齐label宽度
+}
+
+.submit-btn {
+    padding: $spacing-md $spacing-xxl;
+    border-radius: $border-radius;
+    font-size: $font-size-lg;
+    background: $primary-color;
+    color: $text-white;
+    border: none;
+    cursor: pointer;
+    @include shadow(2);
+    transition: all 0.2s;
+    font-weight: $font-weight-medium;
+    min-width: 140px;
+
+    &:hover:not(:disabled) {
+        background: $secondary-color;
+        box-shadow: 0 6px 24px $shadow-light;
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        background: $border-color;
+        color: $text-muted;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+}
+
 /* 新：自定义select皮肤 */
 .custom-select {
     width: 100%;
@@ -977,74 +1180,51 @@ details summary {
             background: transparent;
             cursor: pointer;
             border-bottom: 1px solid rgba($primary-color, 0.05);
+            transition: all 0.15s;
 
             &:last-child {
                 border-bottom: none;
             }
 
-            &:hover,
-            &.selected {
+            &:hover:not(.disabled),
+            &.selected:not(.disabled) {
                 background: rgba($secondary-color, 0.08);
                 color: $secondary-color;
+            }
+
+            &.disabled {
+                color: $text-muted;
+                background: rgba($border-color, 0.1);
+                cursor: not-allowed;
+                opacity: 0.6;
             }
         }
     }
 }
 
-/* 新：内容字段多选chips */
-.depends-section {
+/* 计算字段提示 */
+.calc-field-notice {
+    background: rgba($secondary-color, 0.08);
+    border: 1px solid rgba($secondary-color, 0.2);
+    border-radius: $border-radius;
+    padding: $spacing-md $spacing-lg;
     margin-bottom: $spacing-lg;
-}
-
-.depends-label {
-    margin-bottom: $spacing-xs;
-    font-weight: $font-weight-medium;
-}
-
-.depends-chips {
-    min-height: 32px;
     display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-md;
-}
+    align-items: center;
+    gap: $spacing-sm;
 
-.depends-chip {
-    display: inline-block;
-    border-radius: $border-radius-small;
-    border: 1.5px dashed $primary-color;
-    color: var(--main-font-color);
-    font-size: $font-size-md;
-    padding: 2px $spacing-md;
-    cursor: pointer;
-    background: rgba($background-secondary, 0.85);
-    transition: all 0.12s;
-
-    &.selected {
-        background: $primary-color;
-        color: $text-white;
-        border-style: solid;
-        font-weight: $font-weight-semibold;
+    .notice-icon {
+        font-size: $font-size-xl;
+        flex-shrink: 0;
     }
 
-    &:hover {
-        background: $secondary-color;
-        color: $text-white;
+    .notice-text {
+        color: $text-secondary;
+        font-size: $font-size-sm;
+        line-height: 1.5;
     }
 }
 
-.no-content-tip {
-    color: $text-muted;
-    font-size: $font-size-sm;
-    margin-left: $spacing-lg;
-}
-
-.table-preview-minimal .th-depends {
-    display: block;
-    margin-top: 2px;
-    color: $secondary-color;
-    font-size: $font-size-sm;
-    font-weight: normal;
-}
 
 .visibleto-chips {
     display: flex;
