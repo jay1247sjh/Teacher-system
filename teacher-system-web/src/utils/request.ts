@@ -1,6 +1,7 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
+import { useUserStore } from '@/store/user'
 
 /**
  * 后端统一响应格式
@@ -30,8 +31,9 @@ const request = axios.create({
  */
 request.interceptors.request.use(
     (config) => {
-        // 从localStorage获取token
-        const token = localStorage.getItem('token')
+        // 从Pinia store获取token
+        const userStore = useUserStore()
+        const token = userStore.userInfo?.token
         console.log('[Request] 请求URL:', config.url)
         console.log('[Request] Token:', token)
         if (token && config.headers) {
@@ -54,10 +56,12 @@ request.interceptors.request.use(
 request.interceptors.response.use(
     (response: AxiosResponse<ApiResponse>) => {
         const res = response.data
+        console.log('[Response] 原始响应:', res)
 
         // 后端返回格式: { code: 200, msg: "success", data: ..., timestamp: ..., traceId: ... }
         if (res.code === 200) {
             // 请求成功，返回data
+            console.log('[Response] 返回数据:', res.data)
             return res.data
         } else {
             // 业务错误
@@ -71,26 +75,15 @@ request.interceptors.response.use(
             
             if (isAuthError) {
                 // 认证错误：清除token并跳转到登录页
-                console.log('检测到认证错误，清除token并跳转登录页')
-                console.log('当前 token:', localStorage.getItem('token'))
-                console.log('调用栈:', new Error().stack)
+                console.log('检测到认证错误(code 401/403)，清除token并跳转登录页')
                 ElMessage.error('登录已过期，请重新登录')
-                localStorage.removeItem('token')
-                localStorage.removeItem('userInfo')
+                
+                const userStore = useUserStore()
+                userStore.clearUserInfo()
                 console.log('Token已清除')
                 
-                // 获取当前路径（排除登录和注册页）
-                const currentPath = window.location.pathname
-                const currentRoute = router.currentRoute.value
-                
-                // 只在不是登录页时才跳转
-                if (currentRoute.name !== 'Login' && currentRoute.name !== 'Register') {
-                    // 使用 window.location.href 强制完整跳转，避免 keep-alive 缓存问题
-                    const fullPath = currentPath + window.location.search
-                    const redirectUrl = `/login?redirect=${encodeURIComponent(fullPath)}`
-                    console.log('Token失效，跳转到登录页，保存路径:', fullPath)
-                    window.location.href = redirectUrl
-                }
+                // 跳转到登录页
+                router.push({ name: 'Login' })
             } else {
                 // 其他业务错误：显示错误提示
                 console.log('显示业务错误提示:', errorMsg)
@@ -120,22 +113,11 @@ request.interceptors.response.use(
                     break
                 case 401:
                     errorMessage = data?.msg || '登录已过期，请重新登录'
-                    // 清除token并跳转到登录页，保存当前路径
-                    localStorage.removeItem('token')
-                    localStorage.removeItem('userInfo')
-                    
-                    // 获取当前路径
-                    const currentPath = window.location.pathname
-                    const currentRoute = router.currentRoute.value
-                    
-                    // 只在不是登录页时才跳转
-                    if (currentRoute.name !== 'Login' && currentRoute.name !== 'Register') {
-                        // 使用 window.location.href 强制完整跳转，避免 keep-alive 缓存问题
-                        const fullPath = currentPath + window.location.search
-                        const redirectUrl = `/login?redirect=${encodeURIComponent(fullPath)}`
-                        console.log('Token失效(401)，跳转到登录页，保存路径:', fullPath)
-                        window.location.href = redirectUrl
-                    }
+                    console.log('HTTP 401错误，清除token并跳转登录页')
+                    // 清除token并跳转到登录页
+                    const userStore = useUserStore()
+                    userStore.clearUserInfo()
+                    router.push({ name: 'Login' })
                     break
                 case 403:
                     errorMessage = '没有权限访问'

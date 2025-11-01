@@ -39,3 +39,7 @@ spring:
             group: DEFAULT_GROUP
             refresh: true
 
+# 附件存储路径配置
+attachment:
+  base-path: ${ATTACHMENT_BASE_PATH}
+

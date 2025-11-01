@@ -32,7 +32,7 @@ public class UserVO {
     // 用户头像
     private String avatar;
 
-    // 用户权限列表
+    // 用户权限标识列表（基于RBAC，只返回权限，不返回角色）
     private List<String> permissions;
 
     // 动态路由树

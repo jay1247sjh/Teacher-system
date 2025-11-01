@@ -1,6 +1,6 @@
 spring:
   application:
-    name: teacher-system-login
+    name: teacher-system-user
   profiles:
     active: ${SPRING_PROFILES_ACTIVE}
   config:
@@ -41,4 +41,8 @@ spring:
           - data-id: teacher-system-config-common.yaml
             group: DEFAULT_GROUP
             refresh: true
+
+# 附件存储路径配置
+attachment:
+  base-path: ${ATTACHMENT_BASE_PATH}
 
