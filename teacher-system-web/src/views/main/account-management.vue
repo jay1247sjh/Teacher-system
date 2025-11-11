@@ -283,6 +283,7 @@ export default defineComponent({
         username: user.username,
         password: '',
         email: user.email || '',
+        code: '',
         roleIds: [...user.roleIds]
       }
     },

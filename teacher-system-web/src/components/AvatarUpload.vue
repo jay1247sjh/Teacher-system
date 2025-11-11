@@ -416,7 +416,7 @@ export default defineComponent({
         if (response) {
           ElMessage.success('头像上传成功！')
           
-          let newAvatarPath = response.avatarPath || response.avatarUrl
+          let newAvatarPath = (response as any).avatarPath || (response as any).avatarUrl
           
           if (newAvatarPath && newAvatarPath.includes('/api/v1/attachments/')) {
             newAvatarPath = newAvatarPath.substring(
@@ -616,7 +616,7 @@ export default defineComponent({
           }
           
           // 优先使用 avatarPath（相对路径），如果是外部URL则使用 avatarUrl
-          const newAvatarPath = response.avatarPath || response.avatarUrl
+          const newAvatarPath = (response as any).avatarPath || (response as any).avatarUrl
           console.log('新头像路径:', newAvatarPath)
           
           ElMessage.success('头像设置成功！')

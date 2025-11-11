@@ -15,7 +15,8 @@ export interface RegisterRequest {
   id: string
   username: string
   password: string
-  confirmPassword: string
+  email: string
+  code: string
 }
 
 /**
@@ -34,7 +35,7 @@ export interface UserInfo {
   expireAt: string
   wordId: string
   username: string
-  avatar: string | null
+  avatar?: string
   permissions: string[]
   route: any
 }

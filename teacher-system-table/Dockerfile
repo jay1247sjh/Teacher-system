@@ -18,6 +18,9 @@ RUN mvn install:install-file \
 
 COPY pom.xml .
 
+# 安装父 POM
+RUN mvn -s /root/.m2/settings.xml -N install
+
 COPY teacher-system-common/pom.xml teacher-system-common/
 COPY teacher-system-table/pom.xml teacher-system-table/
 COPY teacher-system-table/teacher-system-table-controller/pom.xml teacher-system-table/teacher-system-table-controller/

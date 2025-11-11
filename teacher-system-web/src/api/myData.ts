@@ -16,6 +16,7 @@ export interface UserDataItem {
   tableName: string
   dataContent: DataContent
   score: number | null
+  status?: number
   reviewMaterial: string | null
   createdAt: string
   updatedAt: string

@@ -220,7 +220,8 @@ export default defineComponent({
     },
 
     // 获取状态文本
-    getStatusText(status: number): string {
+    getStatusText(status?: number): string {
+      if (status === undefined) return '未知';
       const statusMap: Record<number, string> = {
         0: '未提交',
         1: '已提交',
@@ -230,7 +231,8 @@ export default defineComponent({
     },
 
     // 获取状态样式类
-    getStatusClass(status: number): string {
+    getStatusClass(status?: number): string {
+      if (status === undefined) return '';
       const classMap: Record<number, string> = {
         0: 'status-draft',      // 灰色
         1: 'status-submitted',  // 蓝色

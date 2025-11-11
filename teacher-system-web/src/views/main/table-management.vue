@@ -447,7 +447,8 @@ export default defineComponent({
                 tableAliasName: this.tableMeta.alias.trim(),
                 tableFields: this.fieldList.map(field => ({
                     root: !field.editable,  // root=true表示仅管理员可操作，即editable=false
-                    fieldName: field.name
+                    fieldName: field.name,
+                    calc: false  // 默认为非计算字段
                 }))
             };
 

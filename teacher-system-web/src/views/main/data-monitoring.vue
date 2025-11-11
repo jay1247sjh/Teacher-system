@@ -195,7 +195,6 @@ export default defineComponent({
     const showQuickQuery = ref(false)
     const loading = ref(true)
     const connectionError = ref(false)
-    const iframeRef = ref<HTMLIFrameElement | null>(null)
     
     // 配置表单
     const configForm = ref({
@@ -576,11 +575,9 @@ export default defineComponent({
     }
 
     // 监听iframe内部的错误（通过定时检查）
-    let errorCheckTimer: any = null
-    
     const startErrorCheck = () => {
       // 5秒后检查iframe是否成功加载
-      errorCheckTimer = setTimeout(() => {
+      setTimeout(() => {
         if (loading.value) {
           // 如果5秒后还在加载状态，认为连接失败
           loading.value = false
@@ -588,13 +585,6 @@ export default defineComponent({
           ElMessage.error('监控服务连接超时，请检查配置')
         }
       }, 5000)
-    }
-
-    const stopErrorCheck = () => {
-      if (errorCheckTimer) {
-        clearTimeout(errorCheckTimer)
-        errorCheckTimer = null
-      }
     }
 
     onMounted(() => {
