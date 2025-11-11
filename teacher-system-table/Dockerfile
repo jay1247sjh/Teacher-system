@@ -16,7 +16,7 @@ COPY teacher-system-table/teacher-system-table-application/pom.xml teacher-syste
 COPY teacher-system-table/teacher-system-table-domain/pom.xml teacher-system-table/teacher-system-table-domain/
 COPY teacher-system-table/teacher-system-table-infrastructure/pom.xml teacher-system-table/teacher-system-table-infrastructure/
 
-RUN mvn -s /root/.m2/settings.xml -f teacher-system-table/teacher-system-table-controller/pom.xml -DskipTests dependency:go-offline
+RUN mvn -s /root/.m2/settings.xml -f teacher-system-table/pom.xml -DskipTests dependency:go-offline
 
 COPY . .
 
