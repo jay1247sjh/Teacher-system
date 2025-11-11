@@ -192,3 +192,167 @@ chmod +x ./start-infra.sh
 完整的附件 URL 将被构建为 `${VITE_API_TARGET}${VITE_BASE_API}/${VITE_ATTACHMENT_BASE_URL}`。请确保这些环境变量在你的前端 `.env` 文件中正确配置，并且与你的后端服务配置相匹配。
 
 ---
+
+### 6. Docker 命名空间隔离
+
+#### 6.1 概述
+
+项目已支持通过 `COMPOSE_PROJECT_NAME` 环境变量实现容器命名空间隔离，可以在同一台机器上运行多个独立的项目实例。
+
+#### 6.2 命名空间隔离的作用
+
+使用不同的项目名称后，以下资源会自动隔离：
+
+1. **容器名称**: `<项目名>-<服务名>-1`
+2. **网络名称**: `<项目名>-net`
+3. **卷名称**: `<项目名>_<卷名>`
+4. **Docker Compose 管理**: 不同项目名的实例互不干扰
+
+#### 6.3 使用方法
+
+##### 方法 1: 默认命名空间（推荐用于生产）
+
+```bash
+# 使用默认项目名称 "teacher-system"
+./deploy.sh start
+```
+
+**生成的资源名称：**
+- 容器: `teacher-system-gateway-1`, `teacher-system-mysql-1`, etc.
+- 网络: `teacher-system-net`
+- 卷: `teacher-system_mysql-data`, `teacher-system_nacos-data`, etc.
+
+##### 方法 2: 自定义命名空间（用于开发/测试）
+
+```bash
+# 使用自定义项目名称 "teacher-dev"
+COMPOSE_PROJECT_NAME=teacher-dev ./deploy.sh start
+```
+
+**生成的资源名称：**
+- 容器: `teacher-dev-gateway-1`, `teacher-dev-mysql-1`, etc.
+- 网络: `teacher-dev-net`
+- 卷: `teacher-dev_mysql-data`, `teacher-dev_nacos-data`, etc.
+
+##### 方法 3: 多实例部署
+
+可以在同一台机器上运行多个完全独立的实例：
+
+```bash
+# 实例 1: 生产环境
+COMPOSE_PROJECT_NAME=teacher-prod BUILD_ENV=prod ./deploy.sh start
+
+# 实例 2: 测试环境
+COMPOSE_PROJECT_NAME=teacher-test BUILD_ENV=dev ./deploy.sh start
+
+# 实例 3: 开发环境
+COMPOSE_PROJECT_NAME=teacher-dev BUILD_ENV=dev ./deploy.sh start
+```
+
+**注意**: 需要修改端口映射避免冲突，或者使用不同的宿主机端口。
+
+#### 6.4 端口冲突处理
+
+如果要运行多个实例，需要修改 `docker-compose.yaml` 中的端口映射：
+
+**示例：运行两个实例**
+
+实例 1（生产）- 使用默认端口：
+```bash
+COMPOSE_PROJECT_NAME=teacher-prod ./deploy.sh start
+```
+
+实例 2（开发）- 修改端口，创建 `docker-compose.dev.yaml`:
+```yaml
+services:
+  gateway:
+    ports:
+      - "11001:10001"
+  user-service:
+    ports:
+      - "11002:10002"
+  table-service:
+    ports:
+      - "11003:10003"
+  web:
+    ports:
+      - "8080:80"
+  mysql:
+    ports:
+      - "3307:3306"
+  nacos:
+    ports:
+      - "8849:8848"
+      - "9849:9848"
+  prometheus:
+    ports:
+      - "9091:9090"
+```
+
+然后启动：
+```bash
+COMPOSE_PROJECT_NAME=teacher-dev docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
+```
+
+#### 6.5 管理不同命名空间的实例
+
+**查看所有实例：**
+```bash
+docker ps -a                          # 查看所有容器
+docker network ls | grep teacher      # 查看所有网络
+docker volume ls | grep teacher       # 查看所有卷
+```
+
+**操作特定实例：**
+```bash
+COMPOSE_PROJECT_NAME=teacher-dev ./deploy.sh stop      # 停止
+COMPOSE_PROJECT_NAME=teacher-dev ./deploy.sh restart   # 重启
+COMPOSE_PROJECT_NAME=teacher-dev ./deploy.sh status    # 状态
+COMPOSE_PROJECT_NAME=teacher-dev ./deploy.sh logs gateway  # 日志
+COMPOSE_PROJECT_NAME=teacher-dev ./deploy.sh clean     # 清理
+```
+
+#### 6.6 数据隔离
+
+每个命名空间的数据是完全隔离的：
+
+- **MySQL 数据**: 存储在 `<项目名>_mysql-data` 卷中
+- **Nacos 配置**: 存储在 `<项目名>_nacos-data` 卷中
+- **Prometheus 数据**: 存储在 `<项目名>_prometheus-data` 卷中
+- **附件文件**: 存储在项目目录的 `attachments/` 中（共享）
+
+**注意**: `attachments/` 目录是共享的，如果需要隔离，建议为每个实例创建独立的项目目录。
+
+#### 6.7 最佳实践
+
+```bash
+# 生产环境
+COMPOSE_PROJECT_NAME=teacher-system BUILD_ENV=prod ./deploy.sh start
+
+# 开发环境
+COMPOSE_PROJECT_NAME=teacher-dev BUILD_ENV=dev ./deploy.sh start
+
+# 测试环境
+COMPOSE_PROJECT_NAME=teacher-test BUILD_ENV=dev ./deploy.sh start
+
+# 个人开发
+COMPOSE_PROJECT_NAME=teacher-${USER} BUILD_ENV=dev ./deploy.sh start
+```
+
+#### 6.8 环境变量持久化
+
+**Linux/macOS:**
+```bash
+# 添加到 ~/.bashrc 或 ~/.zshrc
+export COMPOSE_PROJECT_NAME=teacher-dev
+source ~/.bashrc
+```
+
+**Windows PowerShell:**
+```powershell
+$env:COMPOSE_PROJECT_NAME = "teacher-dev"
+# 或设置系统环境变量
+[System.Environment]::SetEnvironmentVariable('COMPOSE_PROJECT_NAME', 'teacher-dev', 'User')
+```
+
+---
