@@ -5,6 +5,9 @@
 
 set -e
 
+# 项目名称（用于隔离容器命名空间）
+export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-teacher-system}
+
 # 默认环境
 export BUILD_ENV=${BUILD_ENV:-dev}
 
@@ -80,13 +83,14 @@ create_directories() {
 
 # Create Docker network if it doesn't exist
 create_network() {
-    print_info "Checking Docker network..."
+    local network_name="${COMPOSE_PROJECT_NAME}-net"
+    print_info "Checking Docker network: ${network_name}..."
     
-    if ! docker network inspect teacher-system-net >/dev/null 2>&1; then
-        print_info "Creating Docker network: teacher-system-net"
-        docker network create teacher-system-net
+    if ! docker network inspect "${network_name}" >/dev/null 2>&1; then
+        print_info "Creating Docker network: ${network_name}"
+        docker network create "${network_name}"
     else
-        print_info "Docker network teacher-system-net already exists."
+        print_info "Docker network ${network_name} already exists."
     fi
 }
 

@@ -204,7 +204,7 @@ services:
 networks:
   teacher-system-net:
     driver: bridge
-    name: teacher-system-net
+    name: ${COMPOSE_PROJECT_NAME:-teacher-system}-net
     external: true
 
 volumes:

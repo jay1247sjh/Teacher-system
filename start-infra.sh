@@ -5,6 +5,9 @@
 
 set -e
 
+# 项目名称（用于隔离容器命名空间）
+export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-teacher-system}
+
 # 默认环境
 export BUILD_ENV=${BUILD_ENV:-dev}
 
