@@ -21,6 +21,10 @@ COPY pom.xml .
 COPY teacher-system-gateway/pom.xml teacher-system-gateway/
 COPY teacher-system-common/pom.xml teacher-system-common/
 
+# 先安装 common 模块
+COPY teacher-system-common/ teacher-system-common/
+RUN mvn -s /root/.m2/settings.xml -f teacher-system-common/pom.xml -DskipTests install
+
 RUN mvn -s /root/.m2/settings.xml -f teacher-system-gateway/pom.xml -DskipTests dependency:go-offline
 
 COPY . .

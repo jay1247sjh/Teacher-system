@@ -25,6 +25,10 @@ COPY teacher-system-user/teacher-system-user-application/pom.xml teacher-system-
 COPY teacher-system-user/teacher-system-user-domain/pom.xml teacher-system-user/teacher-system-user-domain/
 COPY teacher-system-user/teacher-system-user-infrastructure/pom.xml teacher-system-user/teacher-system-user-infrastructure/
 
+# 先安装 common 模块
+COPY teacher-system-common/ teacher-system-common/
+RUN mvn -s /root/.m2/settings.xml -f teacher-system-common/pom.xml -DskipTests install
+
 RUN mvn -s /root/.m2/settings.xml -f teacher-system-user/pom.xml -DskipTests dependency:go-offline
 
 COPY . .
