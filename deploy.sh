@@ -78,6 +78,18 @@ create_directories() {
     print_info "Directories created."
 }
 
+# Create Docker network if it doesn't exist
+create_network() {
+    print_info "Checking Docker network..."
+    
+    if ! docker network inspect teacher-system-net >/dev/null 2>&1; then
+        print_info "Creating Docker network: teacher-system-net"
+        docker network create teacher-system-net
+    else
+        print_info "Docker network teacher-system-net already exists."
+    fi
+}
+
 # Load environment variables from config file and export them to the shell environment
 load_and_export_env_vars() {
     ENV_FILE="./config/${BUILD_ENV}.env"
@@ -193,6 +205,7 @@ main() {
         start)
             check_prerequisites
             create_directories
+            create_network
             convert_crlf_to_lf "./config/${BUILD_ENV}.env" # Convert line endings before sourcing
             load_and_export_env_vars # Load and export environment variables
             print_info "Deploying with environment: ${BLUE}${BUILD_ENV}${NC}"
@@ -217,14 +230,16 @@ main() {
         build)
             check_prerequisites
             create_directories
+            create_network
             convert_crlf_to_lf "./config/${BUILD_ENV}.env" # Convert line endings before sourcing
             load_and_export_env_vars # Load and export environment variables
             build_services
             ;;
         rebuild)
-            cleanup
+            stop_services
             check_prerequisites
             create_directories
+            create_network
             convert_crlf_to_lf "./config/${BUILD_ENV}.env" # Convert line endings before sourcing
             load_and_export_env_vars # Load and export environment variables
             build_services
