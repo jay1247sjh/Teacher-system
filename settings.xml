@@ -19,12 +19,6 @@
             <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <mirrorOf>central</mirrorOf>
         </mirror>
-
-        <mirror>
-            <id>tsinghua</id>
-            <mirrorOf>central</mirrorOf>
-            <url>https://mirrors.tuna.tsinghua.edu.cn/maven/repository/</url>
-        </mirror>
     </mirrors>
 
     <profiles>

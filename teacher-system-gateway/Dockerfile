@@ -7,6 +7,15 @@ WORKDIR /teacher-system
 
 COPY settings.xml /root/.m2/settings.xml
 
+# 安装本地 JAR 到 Maven 仓库
+COPY lib/jwt-utils-1.0.0.jar /tmp/jwt-utils-1.0.0.jar
+RUN mvn install:install-file \
+    -Dfile=/tmp/jwt-utils-1.0.0.jar \
+    -DgroupId=sjh.jwt \
+    -DartifactId=jwt-utils \
+    -Dversion=1.0.0 \
+    -Dpackaging=jar
+
 COPY pom.xml .
 
 COPY teacher-system-gateway/pom.xml teacher-system-gateway/
