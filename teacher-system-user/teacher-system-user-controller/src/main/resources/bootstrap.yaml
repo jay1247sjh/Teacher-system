@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: teacher-system-user
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+  config:
+    import: optional:nacos:${spring.application.name}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR}
+        namespace: ${NACOS_NAMESPACE}
+        group: ${NACOS_GROUP}
+        username: ${NACOS_USERNAME}
+        password: ${NACOS_PASSWORD}
+      config:
+        server-addr: ${NACOS_ADDR}
+        namespace: ${NACOS_NAMESPACE}
+        username: ${NACOS_USERNAME}
+        password: ${NACOS_PASSWORD}
+        file-extension: yaml
+        extension-configs:
+          - data-id: teacher-system-config-mysql.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-config-mybatisplus.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-config-email.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-data-email.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-data-publickey.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-data-privatekey.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+          - data-id: teacher-system-config-common.yaml
+            group: DEFAULT_GROUP
+            refresh: true
+
+# 附件存储路径配置
+attachment:
+  base-path: ${ATTACHMENT_BASE_PATH}
+

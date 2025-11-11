@@ -1,0 +1,418 @@
+// ===== 主样式入口文件 =====
+// 导入所有样式文件
+@import './variables.scss';
+@import './mixins.scss';
+@import './components.scss';
+@import './animations.scss';
+
+// 全局重置样式
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+// 基础样式
+html {
+    font-size: 16px;
+    line-height: $line-height-normal;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: $font-family-primary;
+    font-size: $font-size-md;
+    font-weight: $font-weight-normal;
+    line-height: $line-height-normal;
+    color: $text-primary;
+    background-color: $background-primary;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+// 链接样式
+a {
+    color: $primary-color;
+    text-decoration: none;
+    transition: color $transition-normal;
+
+    &:hover {
+        color: $primary-dark;
+        text-decoration: underline;
+    }
+
+    &:focus {
+        outline: 2px solid $primary-color;
+        outline-offset: 2px;
+    }
+}
+
+// 标题样式
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-tight;
+    color: $text-primary;
+}
+
+h1 {
+    font-size: $font-size-giant;
+}
+
+h2 {
+    font-size: $font-size-huge;
+}
+
+h3 {
+    font-size: $font-size-xxxl;
+}
+
+h4 {
+    font-size: $font-size-xxl;
+}
+
+h5 {
+    font-size: $font-size-xl;
+}
+
+h6 {
+    font-size: $font-size-lg;
+}
+
+// 段落样式
+p {
+    margin: 0 0 $spacing-lg 0;
+    line-height: $line-height-normal;
+}
+
+// 列表样式
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+// 图片样式
+img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+// 表格样式
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+// 表单元素样式
+input,
+textarea,
+select {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    cursor: pointer;
+}
+
+// ==================== 全局滚动条样式 ====================
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba($background-secondary, 0.5);
+    border-radius: 5px;
+    margin: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, 
+        rgba($primary-color, 0.6) 0%, 
+        rgba($secondary-color, 0.5) 100%);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: all $transition-normal;
+
+    &:hover {
+        background: linear-gradient(180deg, 
+            rgba($primary-color, 0.8) 0%, 
+            rgba($secondary-color, 0.7) 100%);
+        border-color: rgba($primary-color, 0.1);
+    }
+
+    &:active {
+        background: linear-gradient(180deg, 
+            $primary-color 0%, 
+            $secondary-color 100%);
+    }
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+// Firefox 滚动条样式
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba($primary-color, 0.6) rgba($background-secondary, 0.5);
+}
+
+// 选择文本样式
+::selection {
+    background: rgba($primary-color, 0.2);
+    color: $text-primary;
+}
+
+// 焦点样式
+:focus {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+// 响应式图片
+.responsive-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+// 文本工具类
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.text-truncate {
+    @include text-truncate;
+}
+
+.text-truncate-2 {
+    @include text-truncate-multiline(2);
+}
+
+.text-truncate-3 {
+    @include text-truncate-multiline(3);
+}
+
+// 显示工具类
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.d-inline {
+    display: inline !important;
+}
+
+.d-inline-block {
+    display: inline-block !important;
+}
+
+.d-grid {
+    display: grid !important;
+}
+
+// Flexbox 工具类
+.flex-center {
+    @include flex-center;
+}
+
+.flex-between {
+    @include flex-between;
+}
+
+.flex-column {
+    @include flex-column;
+}
+
+.flex-column-center {
+    @include flex-column-center;
+}
+
+// 间距工具类
+.m-0 {
+    margin: 0 !important;
+}
+
+.m-1 {
+    margin: $spacing-xs !important;
+}
+
+.m-2 {
+    margin: $spacing-sm !important;
+}
+
+.m-3 {
+    margin: $spacing-md !important;
+}
+
+.m-4 {
+    margin: $spacing-lg !important;
+}
+
+.m-5 {
+    margin: $spacing-xl !important;
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+.p-1 {
+    padding: $spacing-xs !important;
+}
+
+.p-2 {
+    padding: $spacing-sm !important;
+}
+
+.p-3 {
+    padding: $spacing-md !important;
+}
+
+.p-4 {
+    padding: $spacing-lg !important;
+}
+
+.p-5 {
+    padding: $spacing-xl !important;
+}
+
+// 颜色工具类
+.text-primary {
+    color: $primary-color !important;
+}
+
+.text-secondary {
+    color: $text-secondary !important;
+}
+
+.text-muted {
+    color: $text-muted !important;
+}
+
+.text-white {
+    color: $text-white !important;
+}
+
+.text-success {
+    color: $success-color !important;
+}
+
+.text-warning {
+    color: $warning-color !important;
+}
+
+.text-error {
+    color: $error-color !important;
+}
+
+.bg-primary {
+    background-color: $primary-color !important;
+}
+
+.bg-secondary {
+    background-color: $background-secondary !important;
+}
+
+.bg-white {
+    background-color: $background-primary !important;
+}
+
+.bg-success {
+    background-color: $success-color !important;
+}
+
+.bg-warning {
+    background-color: $warning-color !important;
+}
+
+.bg-error {
+    background-color: $error-color !important;
+}
+
+// 响应式工具类
+@include mobile {
+    .d-mobile-none {
+        display: none !important;
+    }
+
+    .d-mobile-block {
+        display: block !important;
+    }
+
+    .d-mobile-flex {
+        display: flex !important;
+    }
+}
+
+@include tablet {
+    .d-tablet-none {
+        display: none !important;
+    }
+
+    .d-tablet-block {
+        display: block !important;
+    }
+
+    .d-tablet-flex {
+        display: flex !important;
+    }
+}
+
+@include desktop {
+    .d-desktop-none {
+        display: none !important;
+    }
+
+    .d-desktop-block {
+        display: block !important;
+    }
+
+    .d-desktop-flex {
+        display: flex !important;
+    }
+}

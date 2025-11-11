@@ -1,0 +1,368 @@
+// ===== 组件样式 =====
+@import './variables.scss';
+@import './mixins.scss';
+
+// 表单组件样式
+.form-group {
+    margin-bottom: $spacing-xl;
+
+    label {
+        display: block;
+        color: $text-primary;
+        font-size: $font-size-md;
+        font-weight: $font-weight-medium;
+        margin-bottom: $spacing-sm;
+    }
+
+    .input-wrapper {
+        position: relative;
+
+        i {
+            @include icon-base;
+
+            &.icon-id::before {
+                content: '🆔';
+                font-size: $font-size-lg;
+            }
+
+            &.icon-user::before {
+                content: '👤';
+                font-size: $font-size-lg;
+            }
+
+            &.icon-lock::before {
+                content: '🔒';
+                font-size: $font-size-lg;
+            }
+
+            &.icon-email::before {
+                content: '📧';
+                font-size: $font-size-lg;
+            }
+
+            &.icon-code::before {
+                content: '🔢';
+                font-size: $font-size-lg;
+            }
+        }
+
+        input {
+            @include input-base;
+        }
+
+        .password-toggle {
+            @include password-toggle;
+        }
+    }
+
+    .email-code-wrapper {
+        display: flex;
+        gap: 10px;
+
+        .input-wrapper {
+            flex: 1;
+        }
+
+        .send-code-btn {
+            @include button-info;
+            padding: $spacing-md $spacing-xl;
+            font-size: $font-size-md;
+            white-space: nowrap;
+            min-width: 120px;
+            @include hover-lift-small;
+
+            &:hover:not(:disabled) {
+                box-shadow: 0 5px 15px $shadow-info;
+            }
+
+            &:active:not(:disabled) {
+                transform: translateY(0);
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                background: $text-light;
+            }
+        }
+
+        @include mobile {
+            flex-direction: column;
+
+            .send-code-btn {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    }
+
+    .error-message {
+        @include error-message;
+    }
+
+    .success-message {
+        @include success-message;
+    }
+
+    .warning-message {
+        @include warning-message;
+    }
+}
+
+// 按钮组件样式
+.btn {
+    @include button-base;
+
+    &.btn-primary {
+        @include button-primary;
+    }
+
+    &.btn-secondary {
+        @include button-secondary;
+    }
+
+    &.btn-info {
+        @include button-info;
+    }
+
+    &.btn-outline {
+        @include button-outline;
+    }
+
+    &.btn-sm {
+        padding: $spacing-sm $spacing-md;
+        font-size: $font-size-sm;
+    }
+
+    &.btn-lg {
+        padding: $spacing-lg $spacing-xl;
+        font-size: $font-size-lg;
+    }
+
+    &.btn-block {
+        width: 100%;
+    }
+
+    .loading-spinner {
+        @include loading-spinner;
+    }
+}
+
+// 卡片组件样式
+.card {
+    background: $background-primary;
+    border-radius: $border-radius-large;
+    @include shadow(2);
+    overflow: hidden;
+
+    .card-header {
+        padding: $spacing-xl;
+        border-bottom: 1px solid $border-color;
+
+        h3 {
+            margin: 0;
+            color: $text-primary;
+            font-size: $font-size-xl;
+            font-weight: $font-weight-medium;
+        }
+    }
+
+    .card-body {
+        padding: $spacing-xl;
+    }
+
+    .card-footer {
+        padding: $spacing-xl;
+        border-top: 1px solid $border-color;
+        background: $background-secondary;
+    }
+}
+
+// 模态框组件样式
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: $z-index-modal;
+    @include flex-center;
+    background: rgba($background-dark, 0.5);
+
+    .modal-content {
+        background: $background-primary;
+        border-radius: $border-radius-large;
+        @include shadow(4);
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow: auto;
+    }
+
+    .modal-header {
+        padding: $spacing-xl;
+        border-bottom: 1px solid $border-color;
+        @include flex-between;
+
+        h4 {
+            margin: 0;
+            color: $text-primary;
+            font-size: $font-size-xl;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: $font-size-xl;
+            cursor: pointer;
+            color: $text-muted;
+
+            &:hover {
+                color: $text-primary;
+            }
+        }
+    }
+
+    .modal-body {
+        padding: $spacing-xl;
+    }
+
+    .modal-footer {
+        padding: $spacing-xl;
+        border-top: 1px solid $border-color;
+        @include flex-between;
+    }
+}
+
+// 导航组件样式
+.navbar {
+    background: $background-primary;
+    border-bottom: 1px solid $border-color;
+    padding: $spacing-lg $spacing-xl;
+    @include flex-between;
+
+    .navbar-brand {
+        font-size: $font-size-xl;
+        font-weight: $font-weight-bold;
+        color: $text-primary;
+        text-decoration: none;
+    }
+
+    .navbar-nav {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        .nav-item {
+            margin-left: $spacing-xl;
+
+            .nav-link {
+                color: $text-secondary;
+                text-decoration: none;
+                font-weight: $font-weight-medium;
+                transition: color $transition-normal;
+
+                &:hover {
+                    color: $primary-color;
+                }
+
+                &.active {
+                    color: $primary-color;
+                }
+            }
+        }
+    }
+}
+
+// 表格组件样式
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: $background-primary;
+
+    th,
+    td {
+        padding: $spacing-lg;
+        text-align: left;
+        border-bottom: 1px solid $border-color;
+    }
+
+    th {
+        background: $background-secondary;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+    }
+
+    td {
+        color: $text-secondary;
+    }
+
+    tr:hover {
+        background: $background-light;
+    }
+}
+
+// 徽章组件样式
+.badge {
+    display: inline-block;
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    border-radius: $border-radius-small;
+
+    &.badge-primary {
+        background: $primary-color;
+        color: $text-white;
+    }
+
+    &.badge-secondary {
+        background: $secondary-color;
+        color: $text-white;
+    }
+
+    &.badge-success {
+        background: $success-color;
+        color: $text-white;
+    }
+
+    &.badge-warning {
+        background: $warning-color;
+        color: $text-white;
+    }
+
+    &.badge-error {
+        background: $error-color;
+        color: $text-white;
+    }
+}
+
+// 提示框组件样式
+.alert {
+    padding: $spacing-lg;
+    border-radius: $border-radius;
+    margin-bottom: $spacing-lg;
+
+    &.alert-success {
+        background: rgba($success-color, 0.1);
+        border: 1px solid rgba($success-color, 0.2);
+        color: $success-color;
+    }
+
+    &.alert-warning {
+        background: rgba($warning-color, 0.1);
+        border: 1px solid rgba($warning-color, 0.2);
+        color: $warning-color;
+    }
+
+    &.alert-error {
+        background: rgba($error-color, 0.1);
+        border: 1px solid rgba($error-color, 0.2);
+        color: $error-color;
+    }
+
+    &.alert-info {
+        background: rgba($info-color, 0.1);
+        border: 1px solid rgba($info-color, 0.2);
+        color: $info-color;
+    }
+}

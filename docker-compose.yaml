@@ -1,0 +1,216 @@
+
+
+services:
+  # Gateway Service
+  gateway:
+    build:
+      context: .
+      dockerfile: ./teacher-system-gateway/Dockerfile
+      args:
+        BUILD_ENV: ${BUILD_ENV:-dev}
+    container_name: teacher-system-gateway
+    ports:
+      - "10001:10001"
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    env_file:
+      - ./config/${BUILD_ENV:-dev}.env
+    depends_on:
+      nacos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10001/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # User Service
+  user-service:
+    build:
+      context: .
+      dockerfile: ./teacher-system-user/Dockerfile
+      args:
+        BUILD_ENV: ${BUILD_ENV:-dev}
+    container_name: teacher-system-user
+    ports:
+      - "10002:10002"
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    env_file:
+      - ./config/${BUILD_ENV:-dev}.env
+    volumes:
+      - ./attachments/users:/teacher-system/user/attachments/users
+    depends_on:
+      nacos:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10002/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # Table Service
+  table-service:
+    build:
+      context: .
+      dockerfile: ./teacher-system-table/Dockerfile
+      args:
+        BUILD_ENV: ${BUILD_ENV:-dev}
+    container_name: teacher-system-table
+    ports:
+      - "10003:10003"
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    env_file:
+      - ./config/${BUILD_ENV:-dev}.env
+    volumes:
+      - ./attachments/table-data:/teacher-system/table/attachments/table-data
+    depends_on:
+      nacos:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10003/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # Web Frontend
+  web:
+    build:
+      context: .
+      dockerfile: ./teacher-system-web/Dockerfile
+    container_name: teacher-system-web
+    ports:
+      - "80:80"
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    depends_on:
+      gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: teacher-system-mysql
+    env_file:
+      - ./config/${BUILD_ENV:-dev}.env
+    ports:
+      - "${MYSQL_PORT}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=Asia/Shanghai
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./config/mysql-deploy:/etc/mysql/conf.d
+      - ./config/mysql-deploy/1-init.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./config/nacos-deploy/2-nacos-mysql-schema.sql:/docker-entrypoint-initdb.d/2-nacos-mysql-schema.sql
+    command: 
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Nacos Service Discovery
+  nacos:
+    image: nacos/nacos-server:v2.3.0
+    container_name: teacher-system-nacos
+    env_file:
+      - ./config/${BUILD_ENV:-dev}.env
+    ports:
+      - "${NACOS_HOST_PORT}:${NACOS_CONTAINER_PORT}"
+      - "${NACOS_GRPC_HOST_PORT}:${NACOS_GRPC_CONTAINER_PORT}"
+    environment:
+      - MODE=${MODE}
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_HOST=teacher-system-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DB=${NACOS_DB}
+      - MYSQL_USER=${NACOS_DB_USER}
+      - MYSQL_PASSWORD=${NACOS_DB_PASSWORD}
+      - NACOS_AUTH_ENABLE=true
+      - NACOS_AUTH_TOKEN=${TOKEN_SECRET}
+      - NACOS_AUTH_IDENTITY_KEY=${NACOS_USERNAME}
+      - NACOS_AUTH_IDENTITY_VALUE=${NACOS_PASSWORD}
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - TZ=Asia/Shanghai
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    volumes:
+      - nacos-data:/home/nacos/data
+      - ./config/nacos-deploy:/home/nacos/conf
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/v1/console/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # Prometheus Monitoring (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: teacher-system-prometheus
+    env_file:
+      - ./config/${BUILD_ENV:-dev}.env
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    networks:
+      - teacher-system-net
+    restart: unless-stopped
+    volumes:
+      - ./config/prometheus-deploy:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  teacher-system-net:
+    driver: bridge
+    name: teacher-system-net
+    external: true
+
+volumes:
+  mysql-data:
+    driver: local
+  nacos-data:
+    driver: local
+  prometheus-data:
+    driver: local
