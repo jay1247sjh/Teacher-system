@@ -32,6 +32,8 @@ public class UserAvatarServiceImpl implements IUserAvatarService {
     @Value("${attachment.base-path}")
     private String attachmentBasePath;
 
+    private final String projectRoot = System.getProperty("user.dir");
+
     private static final String[] ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"};
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -62,7 +64,7 @@ public class UserAvatarServiceImpl implements IUserAvatarService {
 
         // 构建存储路径
         String userDir = "users/" + userId;
-        Path dirPath = Paths.get(attachmentBasePath, userDir);
+        Path dirPath = Paths.get(projectRoot, attachmentBasePath, userDir);
 
         try {
             // 创建目录
@@ -121,7 +123,7 @@ public class UserAvatarServiceImpl implements IUserAvatarService {
 
         if (avatarPath != null && !avatarPath.startsWith("http://") && !avatarPath.startsWith("https://")) {
             // 如果是本地文件，删除物理文件
-            Path filePath = Paths.get(attachmentBasePath + avatarPath);
+            Path filePath = Paths.get(projectRoot, attachmentBasePath + avatarPath);
             try {
                 Files.deleteIfExists(filePath);
                 log.info("删除用户 {} 的头像文件: {}", userId, filePath);

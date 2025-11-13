@@ -1,4 +1,4 @@
-FROM library/maven:3.9.6-eclipse-temurin-21 AS build
+FROM ox26n5h75wajyn.xuanyuan.run/library/maven:3.9.6-eclipse-temurin-21 AS build
 
 # 定义构建参数，默认为 dev 环境
 ARG BUILD_ENV=dev
@@ -38,7 +38,7 @@ COPY . .
 
 RUN mvn -s /root/.m2/settings.xml -pl teacher-system-user/teacher-system-user-controller -am -P${BUILD_ENV} -DskipTests package
 
-FROM library/eclipse-temurin:21-jre-jammy AS runtime
+FROM ox26n5h75wajyn.xuanyuan.run/library/eclipse-temurin:21-jre-jammy AS runtime
 
 # 传递环境变量到运行阶段
 ARG BUILD_ENV=dev
@@ -54,15 +54,6 @@ RUN groupadd -r teacher && \
 
 COPY --from=build /teacher-system/teacher-system-user/teacher-system-user-controller/target/*.jar ./app/user.jar
 
-COPY config/${APP_ENV}.env ./config/app.env
-
-RUN tr -d '\r' < ./config/app.env > ./config/app.env.tmp && \
-    mv ./config/app.env.tmp ./config/app.env && \
-    sed -i '/^[[:space:]]*$/d' ./config/app.env && \
-    chown -R teacher:teacher /teacher-system && \
-    chmod 644 ./config/app.env && \
-    chmod +x ./app/user.jar
-
 USER teacher
 
 EXPOSE 10002
@@ -70,5 +61,4 @@ EXPOSE 10002
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD curl -fsS http://localhost:10002/actuator/health || exit 1
 
-ENTRYPOINT ["/bin/bash", "-c", "set -a && source ./config/app.env && exec java -jar ./app/user.jar"]
-
+ENTRYPOINT ["java", "-jar", "./app/user.jar"]
