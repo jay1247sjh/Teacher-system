@@ -1,4 +1,4 @@
-import type { BackendRouteConfig, MenuItem } from './types'
+import type {BackendRouteConfig, MenuItem} from './types'
 
 /**
  * 将后端路由配置转换为菜单数据

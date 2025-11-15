@@ -50,7 +50,10 @@ WORKDIR /teacher-system/user
 
 RUN groupadd -r teacher && \
     useradd -r -g teacher -d /teacher-system -s /bin/bash teacher && \
-    mkdir -p app config attachments
+    mkdir -p /teacher-system/nacos/snapshot && \
+    mkdir -p /teacher-system/nacos/logs && \
+    mkdir -p /teacher-system/nacos/config && \
+    chown -R teacher:teacher /teacher-system/nacos
 
 COPY --from=build /teacher-system/teacher-system-user/teacher-system-user-controller/target/*.jar ./app/user.jar
 
@@ -61,4 +64,4 @@ EXPOSE 10002
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD curl -fsS http://localhost:10002/actuator/health || exit 1
 
-ENTRYPOINT ["java", "-jar", "./app/user.jar"]
+ENTRYPOINT ["java", "-Dnacos.local.snapshot=/teacher-system/nacos/snapshot", "-Dnacos.home=/teacher-system/nacos", "-Dnacos.logging.path=/teacher-system/nacos/logs", "-Dnacos.config.cache.dir=/teacher-system/nacos/config", "-jar", "./app/user.jar"]

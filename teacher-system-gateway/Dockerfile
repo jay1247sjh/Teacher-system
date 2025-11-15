@@ -46,7 +46,10 @@ WORKDIR /teacher-system/gateway
 
 RUN groupadd -r teacher && \
     useradd -r -g teacher -d /teacher-system -s /bin/bash teacher && \
-    mkdir -p app config
+    mkdir -p app config && \
+    mkdir -p /teacher-system/nacos/snapshot && \
+    mkdir -p /teacher-system/nacos/logs && \
+    mkdir -p /teacher-system/nacos/config
 
 COPY --from=build /teacher-system/teacher-system-gateway/target/*.jar ./app/gateway.jar
 
@@ -59,4 +62,4 @@ EXPOSE 10001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD curl -fsS http://localhost:10001/actuator/health || exit 1
 
-ENTRYPOINT ["java", "-jar", "./app/gateway.jar"]
+ENTRYPOINT ["java", "-Dnacos.local.snapshot=/teacher-system/nacos/snapshot", "-Dnacos.home=/teacher-system/nacos", "-Dnacos.logging.path=/teacher-system/nacos/logs", "-Dnacos.config.cache.dir=/teacher-system/nacos/config", "-jar", "./app/gateway.jar"]

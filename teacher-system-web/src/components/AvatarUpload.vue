@@ -223,9 +223,11 @@ export default defineComponent({
     // 显示的头像
     const displayAvatar = computed(() => {
       if (avatarError.value) return null
-      
+
       const avatar = props.avatar
       if (!avatar) return null
+      
+      console.log('[AvatarUpload] displayAvatar 计算中，avatar 值:', avatar)
       
       // 使用固定的时间戳，只在上传成功时更新
       const timestamp = avatarTimestamp.value
@@ -249,7 +251,7 @@ export default defineComponent({
         const baseApiNormalized = baseApiEnv.replace(/^\/|\/$/g, '');
         const attachmentPathNormalized = attachmentPath.replace(/^\/|\/$/g, '');
 
-        const resolvedBase = `${apiTarget}${baseApiNormalized}/${attachmentPathNormalized}`;
+        const resolvedBase = `${apiTarget}/${baseApiNormalized}/${attachmentPathNormalized}`;
         
         return `${resolvedBase}${ensureLeadingSlash(actualPath)}?t=${timestamp}`
       }
@@ -261,9 +263,10 @@ export default defineComponent({
       const baseApiNormalized = baseApiEnv.replace(/^\/|\/$/g, '');
       const attachmentPathNormalized = attachmentPath.replace(/^\/|\/$/g, '');
 
-      const resolvedBase = `${apiTarget}${baseApiNormalized}/${attachmentPathNormalized}`;
-      
-      return `${resolvedBase}${ensureLeadingSlash(avatar)}?t=${timestamp}`
+      const resolvedBase = `http://${apiTarget}/${baseApiNormalized}/${attachmentPathNormalized}`;
+      const finalUrl = `${resolvedBase}${ensureLeadingSlash(avatar)}?t=${timestamp}`
+      console.log('[AvatarUpload] 最终头像 URL:', finalUrl)
+      return finalUrl
     })
     
     // 用户名首字母

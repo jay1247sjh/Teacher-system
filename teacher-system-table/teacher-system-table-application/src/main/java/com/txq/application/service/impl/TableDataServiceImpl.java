@@ -260,7 +260,7 @@ public class TableDataServiceImpl implements ITableDataService {
 
         // 3. 按表格分组
         Map<Integer, List<Map<String, Object>>> groupedData = userDataList.stream()
-                .collect(Collectors.groupingBy(data -> (Integer) data.get("table_id")));
+                .collect(Collectors.groupingBy(data -> convertToInteger(data.get("table_id"))));
 
         // 4. 构建按表格分组的数据
         List<DataByTableVO> dataByTable = groupedData.entrySet().stream()
@@ -278,7 +278,7 @@ public class TableDataServiceImpl implements ITableDataService {
                                 try {
                                     return UserDataItemVO.builder()
                                             .id(((Number) data.get("id")).longValue())
-                                            .tableId((Integer) data.get("table_id"))
+                                            .tableId(convertToInteger(data.get("table_id")))
                                             .tableName(tableName)
                                             .dataContent(parseDataContent((String) data.get("data_content")))
                                             .score((BigDecimal) data.get("score"))
@@ -429,7 +429,7 @@ public class TableDataServiceImpl implements ITableDataService {
                                 try {
                                     return TableDataVO.builder()
                                             .id(((Number) data.get("id")).longValue())
-                                            .tableId((Integer) data.get("table_id"))
+                                            .tableId(convertToInteger(data.get("table_id")))
                                             .userId((String) data.get("user_id"))
                                             .dataContent(parseDataContent((String) data.get("data_content")))
                                             .score((BigDecimal) data.get("score"))

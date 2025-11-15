@@ -33,26 +33,27 @@
     <div v-if="canViewStatistics" class="score-statistics-section">
       <div class="statistics-header">
         <h3 class="section-title">用户得分统计</h3>
-        
+
         <!-- 统计时间区间筛选 -->
         <div class="statistics-filter">
           <label class="filter-label">统计时期：</label>
           <el-date-picker
-            v-model="statisticsDateRange"
-            type="monthrange"
-            range-separator="至"
-            start-placeholder="开始月份"
-            end-placeholder="结束月份"
-            format="YYYY年MM月"
-            value-format="YYYY-MM"
-            style="width: 280px"
-            @change="loadScoreStatistics"
+              v-model="statisticsDateRange"
+              type="monthrange"
+              range-separator="至"
+              start-placeholder="开始月份"
+              end-placeholder="结束月份"
+              format="YYYY年MM月"
+              value-format="YYYY-MM"
+              style="width: 280px"
+              @change="loadScoreStatistics"
           />
         </div>
       </div>
-      
+
       <div v-if="statisticsLoading" class="loading-state">加载中...</div>
-      <div v-else-if="filteredScoreStatistics && filteredScoreStatistics.userScores.length > 0" class="statistics-content">
+      <div v-else-if="filteredScoreStatistics && filteredScoreStatistics.userScores.length > 0"
+           class="statistics-content">
         <!-- 整体统计卡片 -->
         <div class="overall-stats">
           <div class="stat-item">
@@ -71,7 +72,7 @@
 
         <!-- 用户得分列表 -->
         <div class="user-score-list">
-          <div v-for="userScore in filteredScoreStatistics.userScores" :key="userScore.userId" 
+          <div v-for="userScore in filteredScoreStatistics.userScores" :key="userScore.userId"
                class="user-score-item"
                :class="{ 'expanded': expandedUserId === userScore.userId }"
                @click="toggleUserDetail(userScore.userId)">
@@ -130,32 +131,32 @@
           <div class="filter-item">
             <label class="filter-label">成果时期：</label>
             <el-date-picker
-              v-model="filterDateRange"
-              type="monthrange"
-              range-separator="至"
-              start-placeholder="开始月份"
-              end-placeholder="结束月份"
-              format="YYYY年MM月"
-              value-format="YYYY-MM"
-              style="width: 280px"
-              @change="handleFilterChange"
+                v-model="filterDateRange"
+                type="monthrange"
+                range-separator="至"
+                start-placeholder="开始月份"
+                end-placeholder="结束月份"
+                format="YYYY年MM月"
+                value-format="YYYY-MM"
+                style="width: 280px"
+                @change="handleFilterChange"
             />
           </div>
 
           <!-- 状态筛选（仅管理员可见） -->
           <div v-if="isAdmin" class="filter-item">
             <label class="filter-label">审核状态：</label>
-            <el-select 
-              v-model="filterStatus" 
-              placeholder="全部状态" 
-              style="width: 150px"
-              clearable
-              @change="handleFilterChange"
+            <el-select
+                v-model="filterStatus"
+                placeholder="全部状态"
+                style="width: 150px"
+                clearable
+                @change="handleFilterChange"
             >
-              <el-option label="暂存" :value="0" />
-              <el-option label="待审核" :value="1" />
-              <el-option label="审核完成" :value="2" />
-              <el-option label="已退回" :value="3" />
+              <el-option label="暂存" :value="0"/>
+              <el-option label="待审核" :value="1"/>
+              <el-option label="审核完成" :value="2"/>
+              <el-option label="已退回" :value="3"/>
             </el-select>
           </div>
 
@@ -174,7 +175,7 @@
           </span>
         </div>
       </div>
-      
+
       <div v-if="dataLoading" class="loading-state">加载中...</div>
       <div v-else-if="filteredTableData.length === 0" class="empty-state">
         <p>{{ hasActiveFilters ? '没有符合条件的数据' : '暂无数据记录' }}</p>
@@ -183,77 +184,80 @@
       <div v-else class="data-table-container">
         <table class="data-table">
           <thead>
-            <tr>
-              <th class="col-index">序号</th>
-              <th class="col-period">成果时期</th>
-              <th v-for="field in fields" :key="field.fieldName" class="col-field">
-                {{ field.fieldName }}
-                <span v-if="field.root" class="lock-icon" title="管理员字段">🔒</span>
-              </th>
-              <!-- 管理员显示分数和状态列 -->
-              <th v-if="isAdmin" class="col-status">审核状态</th>
-              <th v-if="isAdmin" class="col-score">分数</th>
-              <!-- 普通用户只显示状态列 -->
-              <th v-else class="col-status">状态</th>
-              <th class="col-material">审核材料</th>
-              <th class="col-actions">操作</th>
-            </tr>
+          <tr>
+            <th class="col-index">序号</th>
+            <th class="col-period">成果时期</th>
+            <th v-for="field in fields" :key="field.fieldName" class="col-field">
+              {{ field.fieldName }}
+              <span v-if="field.root" class="lock-icon" title="管理员字段">🔒</span>
+            </th>
+            <!-- 管理员显示分数和状态列 -->
+            <th v-if="isAdmin" class="col-status">审核状态</th>
+            <th v-if="isAdmin" class="col-score">分数</th>
+            <!-- 普通用户只显示状态列 -->
+            <th v-else class="col-status">状态</th>
+            <th class="col-material">审核材料</th>
+            <th class="col-actions">操作</th>
+          </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, index) in filteredTableData" :key="row.id">
-              <td class="col-index">{{ index + 1 }}</td>
-              <td class="col-period">{{ row.submissionPeriod ? formatPeriod(row.submissionPeriod) : (row.status === 0 ? '未设置' : '-') }}</td>
-              <td v-for="field in fields" :key="field.fieldName" class="col-field">
-                {{ row.dataContent[field.fieldName] || '-' }}
-              </td>
-              <!-- 管理员显示状态和分数 -->
-              <template v-if="isAdmin">
-                <td class="col-status">
-                  <div class="status-container">
+          <tr v-for="(row, index) in filteredTableData" :key="row.id">
+            <td class="col-index">{{ index + 1 }}</td>
+            <td class="col-period">
+              {{ row.submissionPeriod ? formatPeriod(row.submissionPeriod) : (row.status === 0 ? '未设置' : '-') }}
+            </td>
+            <td v-for="field in fields" :key="field.fieldName" class="col-field">
+              {{ row.dataContent[field.fieldName] || '-' }}
+            </td>
+            <!-- 管理员显示状态和分数 -->
+            <template v-if="isAdmin">
+              <td class="col-status">
+                <div class="status-container">
                     <span :class="['status-badge', getAdminStatusClass(row.status, row.score)]">
                       {{ getAdminStatusText(row.status, row.score) }}
                     </span>
-                    <div v-if="row.status === 3 && row.rejectReason" class="reject-reason-hint" :title="row.rejectReason">
-                      <span class="reject-icon">⚠</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="col-score">{{ row.score !== null ? row.score : '-' }}</td>
-              </template>
-              <!-- 普通用户只显示状态 -->
-              <td v-else class="col-status">
-                <div class="status-container">
-                  <span :class="['status-badge', getStatusClass(row.status, row.score)]">
-                    {{ getStatusText(row.status, row.score) }}
-                  </span>
                   <div v-if="row.status === 3 && row.rejectReason" class="reject-reason-hint" :title="row.rejectReason">
                     <span class="reject-icon">⚠</span>
                   </div>
                 </div>
               </td>
-              <td class="col-material">
+              <td class="col-score">{{ row.score !== null ? row.score : '-' }}</td>
+            </template>
+            <!-- 普通用户只显示状态 -->
+            <td v-else class="col-status">
+              <div class="status-container">
+                  <span :class="['status-badge', getStatusClass(row.status, row.score)]">
+                    {{ getStatusText(row.status, row.score) }}
+                  </span>
+                <div v-if="row.status === 3 && row.rejectReason" class="reject-reason-hint" :title="row.rejectReason">
+                  <span class="reject-icon">⚠</span>
+                </div>
+              </div>
+            </td>
+            <td class="col-material">
                 <span v-if="row.reviewMaterial" class="attachment-link" @click="openAttachment(row.reviewMaterial)">
                   📎 {{ getAttachmentName(row.reviewMaterial) }}
                 </span>
-                <span v-else>-</span>
-              </td>
-              <td class="col-actions">
-                <!-- 根据状态和角色显示不同的操作按钮 -->
-                <div class="action-buttons">
-                  <button v-if="canEdit(row)" class="btn-edit" @click="openEditDialog(row)">
-                    {{ row.id === -1 ? '继续编辑' : (row.status === 3 ? '重新提交' : '修改') }}
-                  </button>
-                  <!-- 管理员显示退回按钮，普通用户显示删除按钮 -->
-                  <button v-if="isAdmin && canReject(row)" class="btn-reject" @click="openRejectDialog(row)">
-                    退回
-                  </button>
-                  <button v-else-if="canDelete(row)" class="btn-delete" @click="row.id === -1 ? handleDeleteDraft() : handleDelete(row.id)">
-                    {{ row.id === -1 ? '删除暂存' : '删除' }}
-                  </button>
-                  <span v-if="!canEdit(row) && !canDelete(row) && !canReject(row)" class="text-muted">审核通过</span>
-                </div>
-              </td>
-            </tr>
+              <span v-else>-</span>
+            </td>
+            <td class="col-actions">
+              <!-- 根据状态和角色显示不同的操作按钮 -->
+              <div class="action-buttons">
+                <button v-if="canEdit(row)" class="btn-edit" @click="openEditDialog(row)">
+                  {{ row.id === -1 ? '继续编辑' : (row.status === 3 ? '重新提交' : '修改') }}
+                </button>
+                <!-- 管理员显示退回按钮，普通用户显示删除按钮 -->
+                <button v-if="isAdmin && canReject(row)" class="btn-reject" @click="openRejectDialog(row)">
+                  退回
+                </button>
+                <button v-else-if="canDelete(row)" class="btn-delete"
+                        @click="row.id === -1 ? handleDeleteDraft() : handleDelete(row.id)">
+                  {{ row.id === -1 ? '删除暂存' : '删除' }}
+                </button>
+                <span v-if="!canEdit(row) && !canDelete(row) && !canReject(row)" class="text-muted">审核通过</span>
+              </div>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -272,12 +276,12 @@
               {{ field.fieldName }}
               <span v-if="field.root && !canEditAdminField" class="lock-icon" title="无权限编辑管理员字段">🔒</span>
             </label>
-            <input 
-              v-model="formData.dataContent[field.fieldName]"
-              :disabled="field.root && !canEditAdminField"
-              class="form-input"
-              :class="{ 'input-disabled': field.root && !canEditAdminField }"
-              :placeholder="`请输入${field.fieldName}`"
+            <input
+                v-model="formData.dataContent[field.fieldName]"
+                :disabled="field.root && !canEditAdminField"
+                class="form-input"
+                :class="{ 'input-disabled': field.root && !canEditAdminField }"
+                :placeholder="`请输入${field.fieldName}`"
             />
           </div>
           <!-- 所属用户选择（仅管理员可见） -->
@@ -286,27 +290,27 @@
               所属用户
               <span class="required-mark">*</span>
             </label>
-            <div 
-              class="custom-select" 
-              :class="{ open: userSelectOpen, disabled: loadingUsers }" 
-              @click="!loadingUsers && (userSelectOpen = !userSelectOpen)"
+            <div
+                class="custom-select"
+                :class="{ open: userSelectOpen, disabled: loadingUsers }"
+                @click="!loadingUsers && (userSelectOpen = !userSelectOpen)"
             >
               <div class="select-value">
                 {{ selectedUserDisplay }}
                 <span class="select-arrow">⌄</span>
               </div>
               <ul v-if="userSelectOpen && !loadingUsers" class="custom-select-dropdown">
-                <li 
-                  :class="{ selected: formData.userId === '' }"
-                  @click.stop="selectUser('')"
+                <li
+                    :class="{ selected: formData.userId === '' }"
+                    @click.stop="selectUser('')"
                 >
                   请选择用户
                 </li>
-                <li 
-                  v-for="user in normalUsers" 
-                  :key="user.id"
-                  :class="{ selected: formData.userId === user.id }"
-                  @click.stop="selectUser(user.id)"
+                <li
+                    v-for="user in normalUsers"
+                    :key="user.id"
+                    :class="{ selected: formData.userId === user.id }"
+                    @click.stop="selectUser(user.id)"
                 >
                   {{ user.id }} - {{ user.username }}
                 </li>
@@ -322,15 +326,15 @@
               <span class="required-mark">*</span>
             </label>
             <el-date-picker
-              v-model="submissionPeriodDate"
-              type="month"
-              placeholder="请选择成果时期（年-月）"
-              format="YYYY年MM月"
-              value-format="YYYY-MM"
-              style="width: 100%"
-              :clearable="false"
-              :editable="false"
-              @change="handlePeriodChange"
+                v-model="submissionPeriodDate"
+                type="month"
+                placeholder="请选择成果时期（年-月）"
+                format="YYYY年MM月"
+                value-format="YYYY-MM"
+                style="width: 100%"
+                :clearable="false"
+                :editable="false"
+                @change="handlePeriodChange"
             />
             <p class="field-hint">选择此次数据的所属时期</p>
           </div>
@@ -340,12 +344,12 @@
             <label class="form-label">
               分数
             </label>
-            <input 
-              v-model.number="formData.score"
-              type="number"
-              step="0.01"
-              class="form-input"
-              placeholder="请输入分数"
+            <input
+                v-model.number="formData.score"
+                type="number"
+                step="0.01"
+                class="form-input"
+                placeholder="请输入分数"
             />
           </div>
           <div class="form-group">
@@ -359,15 +363,15 @@
                 </span>
                 <button class="btn-remove-attachment" @click="removeAttachment" type="button">×</button>
               </div>
-              
+
               <!-- 上传按钮 -->
               <div v-else class="upload-attachment-area">
-                <input 
-                  ref="fileInput"
-                  type="file"
-                  @change="handleFileSelect"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.webp,.zip,.rar,.7z,.txt,.md"
-                  style="display: none"
+                <input
+                    ref="fileInput"
+                    type="file"
+                    @change="handleFileSelect"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.webp,.zip,.rar,.7z,.txt,.md"
+                    style="display: none"
                 />
                 <button class="btn-upload-attachment" @click="triggerFileInput" type="button">
                   <span class="upload-icon">📁</span>
@@ -375,7 +379,7 @@
                 </button>
                 <p class="upload-hint">支持 PDF、Word、Excel、PPT、图片、压缩包等，最大10MB</p>
               </div>
-              
+
               <!-- 上传进度 -->
               <div v-if="uploadingAttachment" class="uploading-indicator">
                 <span class="loading-spinner">⏳</span>
@@ -411,10 +415,10 @@
               <span class="required-mark">*</span>
             </label>
             <textarea
-              v-model="rejectReason"
-              class="form-textarea"
-              placeholder="请详细说明退回原因，将通过邮件通知用户"
-              rows="5"
+                v-model="rejectReason"
+                class="form-textarea"
+                placeholder="请详细说明退回原因，将通过邮件通知用户"
+                rows="5"
             ></textarea>
             <p class="field-hint">退回原因将通过邮件发送给用户</p>
           </div>
@@ -557,14 +561,14 @@ export default defineComponent({
     // 筛选后的统计数据
     filteredScoreStatistics(): any {
       if (!this.scoreStatistics) return null;
-      
+
       // 如果没有时间筛选，返回原始统计
       if (!this.statisticsDateRange || this.statisticsDateRange.length !== 2) {
         return this.scoreStatistics;
       }
 
       const [startMonth, endMonth] = this.statisticsDateRange;
-      
+
       // 筛选每个用户的数据
       const filteredUserScores = this.scoreStatistics.userScores.map(userScore => {
         // 筛选该用户在时间区间内的数据
@@ -577,9 +581,9 @@ export default defineComponent({
 
         // 重新计算统计数据
         const totalScore = filteredDataList
-          .filter((data: any) => data.score !== null)
-          .reduce((sum: number, data: any) => sum + parseFloat(data.score), 0);
-        
+            .filter((data: any) => data.score !== null)
+            .reduce((sum: number, data: any) => sum + parseFloat(data.score), 0);
+
         const scoredCount = filteredDataList.filter((data: any) => data.score !== null).length;
         const avgScore = scoredCount > 0 ? totalScore / scoredCount : 0;
 
@@ -609,8 +613,8 @@ export default defineComponent({
 
     // 是否有激活的筛选条件
     hasActiveFilters(): boolean {
-      return (this.filterDateRange !== null && this.filterDateRange !== undefined) || 
-             (this.filterStatus !== null && this.filterStatus !== undefined);
+      return (this.filterDateRange !== null && this.filterDateRange !== undefined) ||
+          (this.filterStatus !== null && this.filterStatus !== undefined);
     },
 
     // 判断是否可以设置分数（基于权限标识）
@@ -661,7 +665,7 @@ export default defineComponent({
       const tableId = Number(this.$route.params.id);
       if (!tableId) {
         ElMessage.error('表格ID无效');
-        this.$router.push({ name: 'HomeWelcome' });
+        this.$router.push({name: 'HomeWelcome'});
         return;
       }
 
@@ -670,15 +674,15 @@ export default defineComponent({
         // 从表格列表中查找当前表格
         const tables = await getTableList();
         const table = tables.find(t => t.tableId === tableId);
-        
+
         if (!table) {
           ElMessage.error('表格不存在');
-          this.$router.push({ name: 'HomeWelcome' });
+          this.$router.push({name: 'HomeWelcome'});
           return;
         }
 
         this.tableInfo = table;
-        
+
         // 获取表格字段详情
         const fields = await getTableFields(tableId);
         this.fields = fields.map(f => ({
@@ -689,12 +693,12 @@ export default defineComponent({
 
         // 加载表格数据
         await this.loadTableData();
-        
+
         // 如果是管理员，加载用户得分统计
         if (this.canViewStatistics) {
           await this.loadScoreStatistics();
         }
-        
+
       } catch (error) {
         console.error('加载表格详情失败:', error);
         ElMessage.error('加载表格详情失败');
@@ -712,21 +716,21 @@ export default defineComponent({
         // 从后端加载数据，并过滤掉本地暂存记录（id=-1不会从服务器返回，但为了安全起见还是过滤一下）
         let serverData = await getTableData(tableId);
         console.log('从服务器加载的数据:', serverData);
-        
+
         // 过滤掉所有 id 为负数的记录（本地暂存记录）
         serverData = serverData.filter(item => item.id > 0);
-        
+
         // 从 localStorage 加载暂存数据
         const draftKey = `table_data_draft_${tableId}`;
         const savedDraft = localStorage.getItem(draftKey);
-        
+
         if (savedDraft) {
           try {
             const draft = JSON.parse(savedDraft);
             // 检查暂存数据的时间戳
             const draftAge = Date.now() - (draft.timestamp || 0);
             const sevenDays = 7 * 24 * 60 * 60 * 1000;
-            
+
             if (draftAge < sevenDays) {
               // 构造一个临时的暂存数据项
               const draftItem: TableDataItem = {
@@ -744,7 +748,7 @@ export default defineComponent({
                 createdAt: new Date(draft.timestamp).toISOString(),
                 updatedAt: new Date(draft.timestamp).toISOString()
               };
-              
+
               // 将暂存数据添加到列表最前面
               serverData = [draftItem, ...serverData];
               console.log('添加了本地暂存数据');
@@ -756,7 +760,7 @@ export default defineComponent({
             console.error('解析暂存数据失败:', error);
           }
         }
-        
+
         this.tableData = serverData;
         console.log('最终数据（包含暂存）:', this.tableData);
         console.log('暂存数据:', this.tableData.filter(item => item.status === 0));
@@ -770,7 +774,7 @@ export default defineComponent({
 
     async loadNormalUsers() {
       if (!this.canSelectUser) return;
-      
+
       this.loadingUsers = true;
       try {
         this.normalUsers = await getNormalUsers();
@@ -818,19 +822,19 @@ export default defineComponent({
 
     openAddDialog() {
       this.editingData = null;
-      
+
       // 尝试从 localStorage 恢复暂存数据
       const tableId = Number(this.$route.params.id);
       const draftKey = `table_data_draft_${tableId}`;
       const savedDraft = localStorage.getItem(draftKey);
-      
+
       if (savedDraft) {
         try {
           const draft = JSON.parse(savedDraft);
           // 检查暂存数据的时间戳，如果超过7天则清除
           const draftAge = Date.now() - (draft.timestamp || 0);
           const sevenDays = 7 * 24 * 60 * 60 * 1000;
-          
+
           if (draftAge < sevenDays) {
             ElMessage.info('已恢复上次暂存的数据');
             this.formData = {
@@ -853,7 +857,7 @@ export default defineComponent({
       } else {
         this.initializeEmptyForm();
       }
-      
+
       this.userSelectOpen = false;
       this.showDataDialog = true;
     },
@@ -878,13 +882,13 @@ export default defineComponent({
     openEditDialog(row: TableDataItem) {
       this.editingData = row;
       const period = row.submissionPeriod || this.getCurrentYearMonth();
-      
+
       // 如果是本地暂存数据（id=-1），不传id，这样保存时会当做新增
       this.formData = {
         id: row.id === -1 ? undefined : row.id,
         userId: row.userId,
         submissionPeriod: period,
-        dataContent: { ...row.dataContent },
+        dataContent: {...row.dataContent},
         score: this.canSetScore ? row.score : null,  // 只有管理员才保留分数，普通成员设为null
         reviewMaterial: row.reviewMaterial
       };
@@ -953,7 +957,7 @@ export default defineComponent({
         ElMessage.warning('管理员不能使用暂存功能，请使用保存或退回功能');
         return;
       }
-      
+
       const tableId = Number(this.$route.params.id);
       if (!tableId) return;
 
@@ -974,7 +978,7 @@ export default defineComponent({
           ElMessage.warning('编辑已有数据请使用"申报"按钮提交');
           return;
         }
-        
+
         // 新增数据：保存到localStorage（本地暂存）
         const draftKey = `table_data_draft_${tableId}`;
         const draftData = {
@@ -984,13 +988,13 @@ export default defineComponent({
           reviewMaterial: this.formData.reviewMaterial,
           timestamp: Date.now()
         };
-        
+
         localStorage.setItem(draftKey, JSON.stringify(draftData));
         ElMessage.success('数据已暂存到本地');
-        
+
         // 关闭对话框
         this.closeDataDialog();
-        
+
         // 刷新列表（会自动加载暂存数据）
         await this.loadTableData();
       } catch (error) {
@@ -1005,6 +1009,9 @@ export default defineComponent({
 
       // 验证必填字段
       const hasEmptyField = this.fields.some(field => {
+        if (field.root && !this.canEditAdminField) {
+          return false;
+        }
         const value = this.formData.dataContent[field.fieldName];
         return !value || value.toString().trim() === '';
       });
@@ -1029,7 +1036,7 @@ export default defineComponent({
       try {
         // 确定状态
         let status: number;
-        
+
         // 如果是编辑已有数据且原状态是暂存(0)或退回(3)，提交时改为已提交(1)
         // 如果管理员打了分，状态为2(审核通过)
         // 如果是新增数据，默认为1(已提交)
@@ -1049,7 +1056,7 @@ export default defineComponent({
           // 新增数据
           status = (this.canSetScore && this.formData.score !== null && this.formData.score !== undefined) ? 2 : 1;
         }
-        
+
         // 构建请求数据
         const requestData: any = {
           id: this.formData.id,
@@ -1060,23 +1067,23 @@ export default defineComponent({
           reviewMaterial: this.formData.reviewMaterial,
           status: status  // 传递状态参数
         };
-        
+
         // 只有管理员才能设置分数
         if (this.canSetScore) {
           requestData.score = this.formData.score;
         }
-        
+
         await saveTableData(requestData);
 
         ElMessage.success(this.editingData && this.editingData.id !== -1 ? '修改成功' : '提交成功');
-        
+
         // 保存成功后清除暂存数据
         const draftKey = `table_data_draft_${tableId}`;
         localStorage.removeItem(draftKey);
-        
+
         this.closeDataDialog();
         await this.loadTableData();
-        
+
         // 如果是管理员，刷新统计
         if (this.canViewStatistics) {
           await this.loadScoreStatistics();
@@ -1098,7 +1105,7 @@ export default defineComponent({
         await deleteTableData(id);
         ElMessage.success('删除成功');
         await this.loadTableData();
-        
+
         // 如果是管理员，刷新统计
         if (this.canViewStatistics) {
           await this.loadScoreStatistics();
@@ -1114,21 +1121,21 @@ export default defineComponent({
     async handleDeleteDraft() {
       try {
         await ElMessageBox.confirm(
-          '确定要删除这条暂存数据吗？',
-          '删除确认',
-          {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }
+            '确定要删除这条暂存数据吗？',
+            '删除确认',
+            {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }
         );
 
         const tableId = Number(this.$route.params.id);
         const draftKey = `table_data_draft_${tableId}`;
         localStorage.removeItem(draftKey);
-        
+
         ElMessage.success('暂存数据已删除');
-        
+
         // 刷新列表
         await this.loadTableData();
       } catch (error: any) {
@@ -1170,7 +1177,7 @@ export default defineComponent({
         ElMessage.success('退回成功，已发送邮件通知用户');
         this.closeRejectDialog();
         await this.loadTableData();
-        
+
         // 刷新统计
         if (this.canViewStatistics) {
           await this.loadScoreStatistics();
@@ -1198,7 +1205,7 @@ export default defineComponent({
     async handleFileSelect(event: Event) {
       const target = event.target as HTMLInputElement;
       const file = target.files?.[0];
-      
+
       if (!file) return;
 
       // 验证文件大小（10MB）
@@ -1212,10 +1219,10 @@ export default defineComponent({
       this.uploadingAttachment = true;
       try {
         const response: any = await uploadAttachment(file, 'table-data', String(this.editingData?.id || ''));
-        
+
         // 保存附件路径到表单数据
         this.formData.reviewMaterial = response?.filePath || response?.fileUrl;
-        
+
         ElMessage.success('附件上传成功');
       } catch (error: any) {
         console.error('附件上传失败:', error);
@@ -1235,15 +1242,14 @@ export default defineComponent({
     // 打开附件
     openAttachment(filePath: string) {
       if (!filePath) return;
-      
+
       // 构建完整URL
-      const apiTarget = (import.meta as any).env?.VITE_API_TARGET || 'http://localhost:10001';
-      const baseApi = (import.meta as any).env?.VITE_BASE_API || '/api/v1';
-      const attachmentPath = (import.meta as any).env?.VITE_ATTACHMENT_BASE_URL || 'attachments/';
-      
-      const baseUrl = `${apiTarget}${baseApi}/${attachmentPath.replace(/^\/|\/$/g, '')}/`;
+      const apiTarget = (import.meta as any).env?.VITE_ATTACHMENT_PATH;
+      const attachmentPath = (import.meta as any).env?.VITE_ATTACHMENT_BASE_URL || 'attachment/';
+
+      const baseUrl = `http://${apiTarget}/${attachmentPath.replace(/^\/|\/$/g, '')}`;
       const fullUrl = filePath.startsWith('http') ? filePath : `${baseUrl}${filePath}`;
-      
+
       // 在新标签页打开
       window.open(fullUrl, '_blank');
     },
@@ -1251,13 +1257,13 @@ export default defineComponent({
     // 获取附件名称
     getAttachmentName(filePath: string): string {
       if (!filePath) return '';
-      
+
       // 从路径中提取文件名
       const parts = filePath.split('/');
       const filename = parts[parts.length - 1];
-      
+
       if (!filename) return '';
-      
+
       // 如果文件名包含UUID前缀，去掉它
       const match = filename.match(/^[a-f0-9]{32}_(.+)$/);
       return match && match[1] ? match[1] : filename;
@@ -1345,7 +1351,7 @@ export default defineComponent({
 .detail-subtitle {
   color: $text-secondary;
   font-size: $font-size-md;
-  
+
   .divider {
     margin: 0 $spacing-md;
     color: $border-color;
@@ -1630,7 +1636,7 @@ export default defineComponent({
   border-radius: $border-radius;
   padding: $spacing-lg;
   transition: all 0.3s;
-  
+
   &:hover {
     border-color: $primary-color;
     box-shadow: 0 4px 12px rgba($primary-color, 0.1);
@@ -1724,7 +1730,7 @@ export default defineComponent({
   font-size: $font-size-md;
   cursor: pointer;
   transition: all 0.3s;
-  
+
   &:hover {
     border-color: $primary-color;
     color: $primary-color;
@@ -1740,7 +1746,7 @@ export default defineComponent({
 .filter-result-text {
   font-size: $font-size-md;
   color: $text-secondary;
-  
+
   strong {
     color: $primary-color;
     font-size: $font-size-lg;
@@ -1753,12 +1759,12 @@ export default defineComponent({
   .el-input__wrapper {
     box-shadow: 0 0 0 1px $border-color inset;
     transition: all 0.3s;
-    
+
     &:hover {
       box-shadow: 0 0 0 1px lighten($primary-color, 20%) inset;
     }
   }
-  
+
   &.is-focus .el-input__wrapper {
     box-shadow: 0 0 0 1px $primary-color inset !important;
   }
@@ -1799,7 +1805,7 @@ export default defineComponent({
 
   thead {
     background: $background-secondary;
-    
+
     th {
       padding: $spacing-md;
       text-align: left;
@@ -2003,7 +2009,7 @@ export default defineComponent({
   color: $text-primary;
   font-weight: $font-weight-medium;
   font-size: $font-size-md;
-  
+
   .required-mark {
     color: $error-color;
     margin-left: $spacing-xs;
@@ -2013,25 +2019,25 @@ export default defineComponent({
 // Element Plus DatePicker 样式定制
 :deep(.el-date-editor) {
   width: 100%;
-  
+
   .el-input__wrapper {
     box-shadow: 0 0 0 1px $border-color inset;
     transition: all 0.3s;
-    
+
     &:hover {
       box-shadow: 0 0 0 1px lighten($primary-color, 20%) inset;
     }
   }
-  
+
   &.is-focus .el-input__wrapper {
     box-shadow: 0 0 0 1px $primary-color inset !important;
   }
-  
+
   .el-input__inner {
     color: $text-primary;
     font-size: $font-size-md;
   }
-  
+
   .el-input__prefix {
     color: $primary-color;
   }
@@ -2061,7 +2067,7 @@ export default defineComponent({
     cursor: not-allowed;
     opacity: 0.6;
   }
-  
+
 }
 
 // 自定义下拉框样式
@@ -2098,7 +2104,7 @@ export default defineComponent({
 
   &.open .select-value {
     border-color: $primary-color;
-    
+
     .select-arrow {
       transform: rotate(180deg);
     }
@@ -2267,8 +2273,12 @@ export default defineComponent({
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .attachment-link {
@@ -2421,19 +2431,19 @@ export default defineComponent({
   text-align: center;
   padding: $spacing-huge;
   color: $text-muted;
-  
+
   .empty-icon {
     width: 64px;
     height: 64px;
     margin: 0 auto $spacing-lg;
     opacity: 0.5;
   }
-  
+
   p {
     margin: $spacing-sm 0;
     font-size: $font-size-lg;
   }
-  
+
   .empty-hint {
     font-size: $font-size-sm;
     color: $text-secondary;
@@ -2496,23 +2506,23 @@ export default defineComponent({
   .table-detail-content {
     padding: $spacing-lg;
   }
-  
+
   .fields-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .detail-title {
     font-size: $font-size-xxl;
   }
-  
+
   .detail-subtitle {
     font-size: $font-size-sm;
-    
+
     span {
       display: block;
       margin: $spacing-xs 0;
     }
-    
+
     .divider {
       display: none;
     }

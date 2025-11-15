@@ -105,9 +105,16 @@ export default defineComponent({
         return this.src
       }
       
-      // 如果是绝对路径（以 / 开头），直接返回，不再拼接 baseURL
-      // 因为这些路径已经被父组件处理过了
+      // 如果是绝对路径（以 / 开头），检查是否包含完整的 API 路径
       if (this.src.startsWith('/')) {
+        // 如果包含 /api/v1/attachments，说明是完整的 API 路径，需要拼接 API 目标地址
+        if (this.src.includes('/api/v1/attachments/')) {
+          const apiTarget = (import.meta as any).env?.VITE_API_TARGET || 'http://localhost:10001'
+          console.log('[LazyImage] 检测到完整 API 路径，拼接 apiTarget:', this.src)
+          return `${apiTarget}${this.src}`
+        }
+        // 否则直接返回，不再拼接 baseURL
+        // 因为这些路径已经被父组件处理过了
         return this.src
       }
       

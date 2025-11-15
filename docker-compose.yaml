@@ -95,6 +95,8 @@ services:
     networks:
       - teacher-system-net
     restart: unless-stopped
+    volumes:
+      - ./attachments:/Teacher-system/attachment
     depends_on:
       gateway:
         condition: service_healthy

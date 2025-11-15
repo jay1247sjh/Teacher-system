@@ -110,45 +110,73 @@ load_and_export_env_vars() {
 
 # Start services
 start_services() {
+    local modules=("$@")
     print_info "Starting services with environment: ${BUILD_ENV}"
-    docker-compose up -d
-    print_info "All services started."
+    if [ ${#modules[@]} -eq 0 ]; then
+        docker-compose --env-file ./config/${BUILD_ENV}.env up -d
+        print_info "All services started."
+    else
+        print_info "Starting modules: ${modules[*]}"
+        docker-compose --env-file ./config/${BUILD_ENV}.env up -d "${modules[@]}"
+        print_info "Selected services started."
+    fi
 }
 
 # Stop services
 stop_services() {
-    print_info "Stopping services..."
-    docker-compose stop
-    print_info "All services stopped."
+    local modules=("$@")
+    if [ ${#modules[@]} -eq 0 ]; then
+        print_info "Stopping services..."
+        docker-compose --env-file ./config/${BUILD_ENV}.env stop
+        print_info "All services stopped."
+    else
+        print_info "Stopping modules: ${modules[*]}"
+        docker-compose --env-file ./config/${BUILD_ENV}.env stop "${modules[@]}"
+        print_info "Selected services stopped."
+    fi
 }
 
 # Restart services
 restart_services() {
-    print_info "Restarting services..."
-    docker-compose restart
-    print_info "All services restarted."
+    local modules=("$@")
+    if [ ${#modules[@]} -eq 0 ]; then
+        print_info "Restarting services..."
+        docker-compose --env-file ./config/${BUILD_ENV}.env restart
+        print_info "All services restarted."
+    else
+        print_info "Restarting modules: ${modules[*]}"
+        docker-compose --env-file ./config/${BUILD_ENV}.env restart "${modules[@]}"
+        print_info "Selected services restarted."
+    fi
 }
 
 # Show service status
 show_status() {
     print_info "Service status:"
-    docker-compose ps
+    docker-compose --env-file ./config/${BUILD_ENV}.env ps
 }
 
 # Show logs
 show_logs() {
     if [ -z "$1" ]; then
-        docker-compose logs -f
+        docker-compose --env-file ./config/${BUILD_ENV}.env logs -f
     else
-        docker-compose logs -f "$1"
+        docker-compose --env-file ./config/${BUILD_ENV}.env logs -f "$1"
     fi
 }
 
 # Build services
 build_services() {
+    local modules=("$@")
     print_info "Building services for environment: ${BUILD_ENV}"
-    BUILD_ENV=${BUILD_ENV} docker-compose build --no-cache
-    print_info "Build completed."
+    if [ ${#modules[@]} -eq 0 ]; then
+        docker-compose --env-file ./config/${BUILD_ENV}.env build --no-cache
+        print_info "Build completed."
+    else
+        print_info "Building modules: ${modules[*]}"
+        docker-compose --env-file ./config/${BUILD_ENV}.env build --no-cache "${modules[@]}"
+        print_info "Selected services built."
+    fi
 }
 
 # Clean up
@@ -157,7 +185,7 @@ cleanup() {
     read -r response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         print_info "Cleaning up..."
-        docker-compose down -v
+        docker-compose --env-file ./config/${BUILD_ENV}.env down -v
         print_info "Cleanup completed."
     else
         print_info "Cleanup cancelled."
